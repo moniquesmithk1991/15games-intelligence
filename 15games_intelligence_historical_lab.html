@@ -57,13 +57,16 @@ footer{color:var(--muted);font-size:12px;margin-top:18px}
 <h2>3. Backtest results</h2>
 <div class="kpis">
  <div class="kpi"><b id="nTest">—</b><small>Matches tested</small></div>
- <div class="kpi"><b id="scoreHit">—</b><small>Top exact-score hit rate</small></div>
- <div class="kpi"><b id="drawHit">—</b><small>Draw classification accuracy*</small></div>
- <div class="kpi"><b id="drawBrier">—</b><small>Draw Brier score ↓</small></div>
- <div class="kpi"><b id="drawLog">—</b><small>Draw log loss ↓</small></div>
+ <div class="kpi"><b id="hdaAcc">—</b><small>Home / Draw / Away accuracy</small></div>
+ <div class="kpi"><b id="o15Acc">—</b><small>Over 1.5 accuracy</small></div>
+ <div class="kpi"><b id="o25Acc">—</b><small>Over 2.5 accuracy</small></div>
+ <div class="kpi"><b id="bttsAcc">—</b><small>BTTS accuracy</small></div>
+ <div class="kpi"><b id="hdaRoi">—</b><small>1X2 ROI (with odds)</small></div>
+ <div class="kpi"><b id="o25Roi">—</b><small>Over 2.5 ROI (with odds)</small></div>
+ <div class="kpi"><b id="roiBets">—</b><small>Eligible bets: 1X2 / O2.5</small></div>
  <div class="kpi"><b id="meanXg">—</b><small>Mean total expected goals</small></div>
 </div>
-<p class="muted" style="font-size:11px;margin-top:10px">*Draw classification uses a 33.3% probability threshold; this is a descriptive threshold, not a recommended betting cutoff. Brier score and log loss evaluate probability quality, where lower is better.</p>
+<p class="muted" style="font-size:11px;margin-top:10px">H/D/A selects the most probable outcome; goal markets use a 50% probability threshold. ROI uses flat 1-unit stakes only when model probability is at least 5 percentage points above raw odds-implied probability. No margin removal. ROI is unavailable without historical odds.</p>
 <div id="resultSummary" class="muted" style="margin-top:12px">Import results, then run the test.</div>
 </section>
 <section class="panel wide">
@@ -92,9 +95,10 @@ function parseCSV(text){
  row.push(field);if(row.some(x=>x.trim()))rows.push(row);
  if(rows.length<2)throw Error('CSV needs a header and at least one data row.');
  const headers=rows[0].map(x=>x.trim().toLowerCase());
- const aliases={date:['date','match_date'],league:['league','competition','tournament'],home:['home','home_team','hometeam'],away:['away','away_team','awayteam'],home_goals:['home_goals','fthg','hg','home_score'],away_goals:['away_goals','ftag','ag','away_score']};
+ const aliases={date:['date','match_date','matchdate'],league:['league','competition','tournament','division'],home:['home','home_team','hometeam'],away:['away','away_team','awayteam'],home_goals:['home_goals','fthg','fthome','hg','home_score'],away_goals:['away_goals','ftag','ftaway','ag','away_score']};
  const ix={};for(const k in aliases){ix[k]=headers.findIndex(h=>aliases[k].includes(h));if(ix[k]<0)throw Error('Missing required column: '+k+'. Found: '+headers.join(', '))}
- return rows.slice(1).map((r,i)=>{let d=r[ix.date].trim(),hg=Number(r[ix.home_goals]),ag=Number(r[ix.away_goals]);if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!Number.isInteger(hg)||!Number.isInteger(ag)||hg<0||ag<0)throw Error('Invalid date or score on CSV row '+(i+2));let m={date:d,league:r[ix.league].trim(),home:r[ix.home].trim(),away:r[ix.away].trim(),hg,ag};if(!m.league||!m.home||!m.away||m.home===m.away)throw Error('Missing or invalid team/league on row '+(i+2));return m})
+  const optional={oh:['oddhome','maxhome','home_odds'],od:['odddraw','maxdraw','draw_odds'],oa:['oddaway','maxaway','away_odds'],o25:['over25','maxover25','over_2_5_odds']};const oi={};for(const k in optional)oi[k]=headers.findIndex(h=>optional[k].includes(h));
+  return rows.slice(1).map((r,i)=>{let d=r[ix.date].trim(),hg=Number(r[ix.home_goals]),ag=Number(r[ix.away_goals]);if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!Number.isInteger(hg)||!Number.isInteger(ag)||hg<0||ag<0)throw Error('Invalid date or score on CSV row '+(i+2));let m={date:d,league:r[ix.league].trim(),home:r[ix.home].trim(),away:r[ix.away].trim(),hg,ag};for(const k in oi){let v=oi[k]>=0?Number(r[oi[k]]):NaN;if(Number.isFinite(v)&&v>1)m[k]=v;}if(!m.league||!m.home||!m.away||m.home===m.away)throw Error('Missing or invalid team/league on row '+(i+2));return m})
 }
 function csvDownload(name,content){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
 $('template').onclick=()=>csvDownload('15gim_historical_template.csv','date,league,home,away,home_goals,away_goals\n2025-08-15,Example League,Home FC,Away FC,2,1\n');
@@ -104,6 +108,8 @@ function afterImport(msg){let ls=[...new Set(matches.map(m=>m.league))].sort();$
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function poisson(l,max=8){let a=[Math.exp(-l)];for(let i=1;i<=max;i++)a[i]=a[i-1]*l/i;return a}
 function scoreModel(hx,ax){let hp=poisson(hx),ap=poisson(ax),out=[],draw=0;for(let h=0;h<=8;h++)for(let a=0;a<=8;a++){let p=hp[h]*ap[a];out.push({h,a,p});if(h===a)draw+=p}out.sort((a,b)=>b.p-a.p);return {out,draw}}
+function marketProbs(hx,ax){let hp=poisson(hx),ap=poisson(ax),p={H:0,D:0,A:0,o15:0,o25:0,btts:0};for(let h=0;h<=8;h++)for(let a=0;a<=8;a++){let v=hp[h]*ap[a];if(h>a)p.H+=v;else if(h===a)p.D+=v;else p.A+=v;if(h+a>=2)p.o15+=v;if(h+a>=3)p.o25+=v;if(h>0&&a>0)p.btts+=v;}return p}
+function roiCalc(rows,market){let profit=0,bets=0;for(const x of rows){let odds,prob,won;if(market==='hda'){let k=['H','D','A'].reduce((a,b)=>x.probs[b]>x.probs[a]?b:a);odds=x[k==='H'?'oh':k==='D'?'od':'oa'];prob=x.probs[k];won=k===x.actual;}else{odds=x.o25;prob=x.probs.o25;won=x.hg+x.ag>=3;}if(Number.isFinite(odds)&&odds>1&&prob>1/odds+.05){bets++;profit+=won?odds-1:-1;}}return {bets,profit,roi:bets?profit/bets:null}}
 
 $('run').onclick = async () => {
     const minN = Number($('minHistory').value);
@@ -236,17 +242,13 @@ $('run').onclick = async () => {
                     Math.min(1 - 1e-8, pred.model.draw)
                 );
 
-                tests.push({
-                    ...f,
-                    ...pred,
-                    top,
-                    actualDraw,
-                    topHit: top.h === f.hg && top.a === f.ag,
-                    brier: (drawP - (actualDraw ? 1 : 0)) ** 2,
-                    logloss: -(actualDraw
-                        ? Math.log(drawP)
-                        : Math.log(1 - drawP))
-                });
+                const probs=marketProbs(pred.hx,pred.ax);
+                const actual=f.hg>f.ag?'H':f.hg===f.ag?'D':'A';
+                const predicted=['H','D','A'].reduce((a,b)=>probs[b]>probs[a]?b:a);
+                tests.push({...f,...pred,probs,actual,predicted,hdaHit:predicted===actual,
+                  o15Hit:(f.hg+f.ag>=2)===(probs.o15>=.5),
+                  o25Hit:(f.hg+f.ag>=3)===(probs.o25>=.5),
+                  bttsHit:((f.hg>0&&f.ag>0)===(probs.btts>=.5))});
             }
 
             // Add the completed matches from this date to history.
@@ -309,16 +311,14 @@ $('run').onclick = async () => {
 function pct(x){return (100*x).toFixed(1)+'%'}
 function renderTests(skipped,total){
  $('tested').textContent=tests.length;$('nTest').textContent=tests.length||'0';
- if(!tests.length){$('resultSummary').textContent=`No matches qualified. ${skipped} skipped; reduce minimum history or import more seasons.`;['scoreHit','drawHit','drawBrier','drawLog','meanXg'].forEach(id=>$(id).textContent='—');$('resultsTable').innerHTML='<p class="muted">No qualifying tests.</p>';return}
- let score=tests.filter(x=>x.topHit).length/tests.length;
- let drawAcc=tests.filter(x=>(x.draw>=.333)===x.actualDraw).length/tests.length;
- let brier=tests.reduce((s,x)=>s+x.brier,0)/tests.length,log=tests.reduce((s,x)=>s+x.logloss,0)/tests.length,mg=tests.reduce((s,x)=>s+x.hx+x.ax,0)/tests.length;
- $('scoreHit').textContent=pct(score);$('drawHit').textContent=pct(drawAcc);$('drawBrier').textContent=brier.toFixed(4);$('drawLog').textContent=log.toFixed(4);$('meanXg').textContent=mg.toFixed(2);
- $('resultSummary').innerHTML=`Tested <b>${tests.length}</b> of ${total} matches; skipped <b>${skipped}</b> because team history was insufficient. These figures describe this dataset and configuration only.`;
- let recent=tests.slice(-100).reverse();
- $('resultsTable').innerHTML=`<table><thead><tr><th>Date</th><th>Competition</th><th>Fixture</th><th>Expected goals</th><th>Top score</th><th>Actual</th><th>Draw probability</th><th>Top score hit</th></tr></thead><tbody>${recent.map(x=>`<tr><td>${x.date}</td><td>${esc(x.league)}</td><td>${esc(x.home)} – ${esc(x.away)}</td><td>${x.hx.toFixed(2)} – ${x.ax.toFixed(2)}</td><td>${x.top.h}-${x.top.a} (${pct(x.top.p)})</td><td>${x.hg}-${x.ag}</td><td>${pct(x.draw)}</td><td class="${x.topHit?'good':'bad'}">${x.topHit?'YES':'NO'}</td></tr>`).join('')}</tbody></table><p class="muted" style="font-size:11px">Showing most recent ${recent.length} qualified matches.</p>`;
-};
-function showStats(){ $('tested').textContent='0';$('nTest').textContent='—';$('scoreHit').textContent='—';$('drawHit').textContent='—';$('drawBrier').textContent='—';$('drawLog').textContent='—';$('meanXg').textContent='—';$('resultSummary').textContent='Import results, then run the test.'}
+ if(!tests.length){$('resultSummary').textContent=`No matches qualified. ${skipped} skipped; reduce minimum history or import more seasons.`;['hdaAcc','o15Acc','o25Acc','bttsAcc','hdaRoi','o25Roi','roiBets','meanXg'].forEach(id=>$(id).textContent='—');$('resultsTable').innerHTML='<p class="muted">No qualifying tests.</p>';return}
+ const rate=k=>tests.filter(x=>x[k]).length/tests.length,hroi=roiCalc(tests,'hda'),oroi=roiCalc(tests,'o25');
+ $('hdaAcc').textContent=pct(rate('hdaHit'));$('o15Acc').textContent=pct(rate('o15Hit'));$('o25Acc').textContent=pct(rate('o25Hit'));$('bttsAcc').textContent=pct(rate('bttsHit'));
+ $('hdaRoi').textContent=hroi.roi===null?'No odds':pct(hroi.roi);$('o25Roi').textContent=oroi.roi===null?'No odds':pct(oroi.roi);$('roiBets').textContent=`${hroi.bets} / ${oroi.bets}`;$('meanXg').textContent=(tests.reduce((s,x)=>s+x.hx+x.ax,0)/tests.length).toFixed(2);
+ $('resultSummary').innerHTML=`Tested <b>${tests.length}</b> of ${total} matches; skipped <b>${skipped}</b> because team history was insufficient. Net profit: 1X2 ${hroi.profit>=0?'+':''}${hroi.profit.toFixed(2)} units; Over 2.5 ${oroi.profit>=0?'+':''}${oroi.profit.toFixed(2)} units.`;
+ let recent=tests.slice(-100).reverse();$('resultsTable').innerHTML=`<table><thead><tr><th>Date</th><th>Competition</th><th>Fixture</th><th>Actual</th><th>Predicted H/D/A</th><th>O1.5</th><th>O2.5</th><th>BTTS</th></tr></thead><tbody>${recent.map(x=>`<tr><td>${x.date}</td><td>${esc(x.league)}</td><td>${esc(x.home)} – ${esc(x.away)}</td><td>${x.hg}-${x.ag}</td><td>${x.predicted} (${pct(x.probs[x.predicted])})</td><td>${pct(x.probs.o15)} · ${x.o15Hit?'Hit':'Miss'}</td><td>${pct(x.probs.o25)} · ${x.o25Hit?'Hit':'Miss'}</td><td>${pct(x.probs.btts)} · ${x.bttsHit?'Hit':'Miss'}</td></tr>`).join('')}</tbody></table><p class="muted" style="font-size:11px">Showing most recent ${recent.length} qualified matches. ROI is a historical simulation, not a guarantee.</p>`;
+}
+function showStats(){ $('tested').textContent='0';$('nTest').textContent='—';['hdaAcc','o15Acc','o25Acc','bttsAcc','hdaRoi','o25Roi','roiBets','meanXg'].forEach(id=>$(id).textContent='—');$('resultSummary').textContent='Import results, then run the test.'}
 $('clear').onclick=()=>{if(confirm('Clear imported match data from this page?')){matches=[];tests=[];$('csv').value='';$('importStatus').textContent='No dataset loaded.';$('matches').textContent='0';$('leagues').textContent='0';$('teams').textContent='0';$('tested').textContent='0';$('leagueFilter').innerHTML='<option value="all">All imported competitions</option>';$('run').disabled=true;showStats();$('resultsTable').innerHTML='<p class="muted">No backtest output yet.</p>'}};
 </script>
 </body></html>
