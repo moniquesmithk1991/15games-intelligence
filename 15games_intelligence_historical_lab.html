@@ -104,35 +104,208 @@ function afterImport(msg){let ls=[...new Set(matches.map(m=>m.league))].sort();$
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function poisson(l,max=8){let a=[Math.exp(-l)];for(let i=1;i<=max;i++)a[i]=a[i-1]*l/i;return a}
 function scoreModel(hx,ax){let hp=poisson(hx),ap=poisson(ax),out=[],draw=0;for(let h=0;h<=8;h++)for(let a=0;a<=8;a++){let p=hp[h]*ap[a];out.push({h,a,p});if(h===a)draw+=p}out.sort((a,b)=>b.p-a.p);return {out,draw}}
-function trainPredict(prior,fixture,minN,decay){
- const comp=prior.filter(x=>x.league===fixture.league);
- const teams=[...new Set(comp.flatMap(x=>[x.home,x.away]))];
- let totalGoals=0,homeGoals=0,awayGoals=0,homeN=0;
- comp.forEach(x=>{totalGoals+=x.hg+x.ag;homeGoals+=x.hg;awayGoals+=x.ag;homeN++});
- let lgHome=homeN?homeGoals/homeN:1.35,lgAway=homeN?awayGoals/homeN:1.1;
- function teamStats(team){let gf=0,ga=0,n=0,w=0;for(let i=0;i<comp.length;i++){let x=comp[i],ageDays=(new Date(fixture.date)-new Date(x.date))/(86400000),weight=decay?Math.exp(-decay*Math.max(0,ageDays/30)):1;if(x.home===team){gf+=x.hg*weight;ga+=x.ag*weight;n+=weight}else if(x.away===team){gf+=x.ag*weight;ga+=x.hg*weight;n+=weight}}return {gf,ga,n}}
- let hs=teamStats(fixture.home),as=teamStats(fixture.away);
- if(hs.n<minN||as.n<minN)return null;
- // Shrink team rates toward league means to reduce small-sample extremes.
- const priorStrength=5;
- let hAttack=((hs.gf+priorStrength*lgHome)/(hs.n+priorStrength))/Math.max(.1,lgHome);
- let hDefence=((hs.ga+priorStrength*lgAway)/(hs.n+priorStrength))/Math.max(.1,lgAway);
- let aAttack=((as.gf+priorStrength*lgAway)/(as.n+priorStrength))/Math.max(.1,lgAway);
- let aDefence=((as.ga+priorStrength*lgHome)/(as.n+priorStrength))/Math.max(.1,lgHome);
- let hx=lgHome*hAttack*aDefence,ax=lgAway*aAttack*hDefence;
- hx=Math.max(.15,Math.min(4.2,hx));ax=Math.max(.15,Math.min(4.2,ax));
- return {hx,ax,model:scoreModel(hx,ax)}
-}
-$('run').onclick=()=>{
- const minN=Number($('minHistory').value),decay=Number($('decay').value),filter=$('leagueFilter').value;
- const data=matches.filter(m=>filter==='all'||m.league===filter).slice().sort((a,b)=>a.date.localeCompare(b.date));
- tests=[];let skipped=0;
- for(let i=0;i<data.length;i++){let f=data[i],prior=data.filter(x=>x.date<f.date);let pred=trainPredict(prior,f,minN,decay);if(!pred){skipped++;continue}
- let actualDraw=f.hg===f.ag,top=pred.model.out[0],drawP=Math.max(1e-8,Math.min(1-1e-8,pred.model.draw));
- tests.push({...f,...pred,top,actualDraw,topHit:top.h===f.hg&&top.a===f.ag,brier:(drawP-(actualDraw?1:0))**2,logloss:-(actualDraw?Math.log(drawP):Math.log(1-drawP))});
- }
- renderTests(skipped,data.length);
+
+$('run').onclick = async () => {
+    const minN = Number($('minHistory').value);
+    const decay = Number($('decay').value);
+    const filter = $('leagueFilter').value;
+
+    const data = matches
+        .filter(m => filter === 'all' || m.league === filter)
+        .slice()
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    tests = [];
+    let skipped = 0;
+    let completed = 0;
+    const leagues = new Map();
+
+    function getState(league, date) {
+        if (!leagues.has(league)) {
+            leagues.set(league, {
+                homeGoals: 0,
+                awayGoals: 0,
+                n: 0,
+                teams: new Map(),
+                lastDate: date
+            });
+        }
+
+        const state = leagues.get(league);
+
+        if (state.lastDate !== date) {
+            const days = Math.max(
+                0,
+                (new Date(date) - new Date(state.lastDate)) / 86400000
+            );
+
+            const factor = decay
+                ? Math.exp(-decay * days / 30)
+                : 1;
+
+            state.homeGoals *= factor;
+            state.awayGoals *= factor;
+            state.n *= factor;
+
+            for (const team of state.teams.values()) {
+                team.gf *= factor;
+                team.ga *= factor;
+                team.n *= factor;
+            }
+
+            state.lastDate = date;
+        }
+
+        return state;
+    }
+
+    function predict(state, fixture) {
+        const lgHome = state.n
+            ? state.homeGoals / state.n : 1.35;
+        const lgAway = state.n
+            ? state.awayGoals / state.n : 1.1;
+
+        const hs = state.teams.get(fixture.home) || {
+            gf: 0, ga: 0, n: 0
+        };
+
+        const as = state.teams.get(fixture.away) || {
+            gf: 0, ga: 0, n: 0
+        };
+
+        if (hs.n < minN || as.n < minN) return null;
+
+        const priorStrength = 5;
+
+        const hAttack =
+            ((hs.gf + priorStrength * lgHome) /
+            (hs.n + priorStrength)) / Math.max(.1, lgHome);
+
+        const hDefence =
+            ((hs.ga + priorStrength * lgAway) /
+            (hs.n + priorStrength)) / Math.max(.1, lgAway);
+
+        const aAttack =
+            ((as.gf + priorStrength * lgAway) /
+            (as.n + priorStrength)) / Math.max(.1, lgAway);
+
+        const aDefence =
+            ((as.ga + priorStrength * lgHome) /
+            (as.n + priorStrength)) / Math.max(.1, lgHome);
+
+        let hx = lgHome * hAttack * aDefence;
+        let ax = lgAway * aAttack * hDefence;
+
+        hx = Math.max(.15, Math.min(4.2, hx));
+        ax = Math.max(.15, Math.min(4.2, ax));
+
+        return { hx, ax, model: scoreModel(hx, ax) };
+    }
+
+    $('run').disabled = true;
+    $('importStatus').textContent = 'Walk-forward test starting...';
+
+    try {
+        let start = 0;
+        let lastYield = 0;
+
+        while (start < data.length) {
+            const date = data[start].date;
+            let end = start + 1;
+
+            while (end < data.length && data[end].date === date) {
+                end++;
+            }
+
+            // Predict every match on this date before adding
+            // any results from that date to the historical record.
+            for (let i = start; i < end; i++) {
+                const f = data[i];
+                const state = getState(f.league, f.date);
+                const pred = predict(state, f);
+
+                if (!pred) {
+                    skipped++;
+                    continue;
+                }
+
+                const actualDraw = f.hg === f.ag;
+                const top = pred.model.out[0];
+                const drawP = Math.max(
+                    1e-8,
+                    Math.min(1 - 1e-8, pred.model.draw)
+                );
+
+                tests.push({
+                    ...f,
+                    ...pred,
+                    top,
+                    actualDraw,
+                    topHit: top.h === f.hg && top.a === f.ag,
+                    brier: (drawP - (actualDraw ? 1 : 0)) ** 2,
+                    logloss: -(actualDraw
+                        ? Math.log(drawP)
+                        : Math.log(1 - drawP))
+                });
+            }
+
+            // Add the completed matches from this date to history.
+            for (let i = start; i < end; i++) {
+                const f = data[i];
+                const state = getState(f.league, f.date);
+
+                state.homeGoals += f.hg;
+                state.awayGoals += f.ag;
+                state.n += 1;
+
+                if (!state.teams.has(f.home)) {
+                    state.teams.set(f.home, { gf: 0, ga: 0, n: 0 });
+                }
+
+                if (!state.teams.has(f.away)) {
+                    state.teams.set(f.away, { gf: 0, ga: 0, n: 0 });
+                }
+
+                const home = state.teams.get(f.home);
+                home.gf += f.hg;
+                home.ga += f.ag;
+                home.n += 1;
+
+                const away = state.teams.get(f.away);
+                away.gf += f.ag;
+                away.ga += f.hg;
+                away.n += 1;
+            }
+
+            completed = end;
+            start = end;
+
+            // Let the browser update the page regularly.
+            if (completed - lastYield >= 300) {
+                $('importStatus').textContent =
+                    `Testing ${completed.toLocaleString()} of ` +
+                    `${data.length.toLocaleString()} matches...`;
+
+                lastYield = completed;
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+        }
+
+        renderTests(skipped, data.length);
+
+        $('importStatus').textContent =
+            `Walk-forward test complete. ${tests.length.toLocaleString()} ` +
+            `matches tested; ${skipped.toLocaleString()} skipped.`;
+
+    } catch (error) {
+        $('importStatus').textContent =
+            'Testing stopped: ' + error.message;
+        console.error(error);
+    } finally {
+        $('run').disabled = false;
+    }
 };
+
 function pct(x){return (100*x).toFixed(1)+'%'}
 function renderTests(skipped,total){
  $('tested').textContent=tests.length;$('nTest').textContent=tests.length||'0';
