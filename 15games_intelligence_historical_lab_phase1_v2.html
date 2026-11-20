@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>15GAMES Intelligence — Historical Lab Phase 1</title>
+<style>
+:root{color-scheme:dark;--bg:#080d18;--panel:#111a2b;--panel2:#0c1423;--line:#26344d;--text:#edf3ff;--muted:#98a8c3;--accent:#63e6be;--blue:#77a9ff;--red:#ff8585;--yellow:#ffd166}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#09101e,#080d18 55%);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}main{max-width:1240px;margin:auto;padding:26px 18px 60px}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:22px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}h1{font-size:clamp(27px,4vw,42px);line-height:1.08;margin:7px 0 8px}.sub{color:var(--muted);max-width:760px;margin:0}.pill{border:1px solid #315b56;background:#102a2a;color:var(--accent);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800;white-space:nowrap}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:17px;min-width:0}.upload{grid-column:span 7}.settings{grid-column:span 5}.wide{grid-column:1/-1}.half{grid-column:span 6}.panel h2{font-size:16px;margin:0 0 12px}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}input,button{font:inherit}input[type=file]{display:block;width:100%;padding:13px;border:1px dashed #526581;border-radius:10px;background:#0a1220;color:var(--muted)}input[type=number]{width:100%;padding:10px;background:#091222;color:var(--text);border:1px solid var(--line);border-radius:9px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}button{border:0;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:var(--accent);color:#06211b}button.secondary{background:#1b2a42;color:var(--text);border:1px solid #354765}button:disabled{opacity:.45;cursor:not-allowed}.setting-row{display:grid;grid-template-columns:1fr 110px;align-items:center;gap:12px;margin:11px 0}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.stat{background:#0a1322;border:1px solid var(--line);border-radius:12px;padding:13px}.stat .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.stat .value{font-size:23px;font-weight:850;margin-top:4px;font-variant-numeric:tabular-nums}.stat .hint{font-size:11px;color:var(--muted)}.status{margin-top:12px;padding:10px 12px;border-radius:10px;background:#0a1424;border:1px solid var(--line);color:var(--muted);font-size:13px}.status.good{border-color:#27634e;color:var(--accent)}.status.bad{border-color:#754040;color:#ffaaaa}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}table{width:100%;border-collapse:collapse;min-width:700px;font-size:13px}th,td{text-align:right;padding:11px 12px;border-bottom:1px solid #223149;white-space:nowrap}th{background:#0b1423;color:#aebdd5;font-size:11px;text-transform:uppercase;letter-spacing:.06em;position:sticky;top:0}td:first-child,th:first-child{text-align:left}tr:last-child td{border-bottom:0}.positive{color:var(--accent)}.negative{color:var(--red)}.neutral{color:var(--muted)}.tag{display:inline-block;border:1px solid #354765;border-radius:6px;padding:2px 6px;font-size:11px;color:#b7c8e3}.foot{margin-top:20px;color:var(--muted);font-size:12px}.columns{columns:2;column-gap:24px}.columns code{color:#c8dcff}.hidden{display:none!important}@media(max-width:760px){main{padding:18px 12px 40px}.upload,.settings,.half{grid-column:1/-1}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat .value{font-size:20px}.columns{columns:1}}
+</style></head>
+<body><main>
+<header class="top"><div><div class="eyebrow">15GAMES Intelligence · Historical Lab</div><h1>Phase 1 Backtesting · Performance Update</h1><p class="sub">Chronological testing for Straight Win (Home / Draw / Away) and Over 2.5 Goals, with bookmaker-by-bookmaker odds, value bets and returns.</p></div><div class="pill">PHASE 1 · TWO MARKETS</div></header>
+<section class="grid">
+<div class="panel upload"><h2>1. Load historical match data</h2><p class="muted">Upload a CSV containing match dates, teams, final scores and any available bookmaker odds. The backtest uses an optimized running history and processes large files in responsive batches. Predictions for each date use only earlier dates.</p><input id="csvFile" type="file" accept=".csv,text/csv"><div class="actions"><button id="runBtn" disabled>Run walk-forward test</button><button class="secondary" id="templateBtn">Download CSV template</button><button class="secondary" id="sampleBtn">Load demo data</button></div><div id="status" class="status">Waiting for a CSV file. You can download the template to see the required column names.</div></div>
+<div class="panel settings"><h2>2. Backtest settings</h2><div class="setting-row"><label for="edge">Minimum value edge (percentage points)</label><input id="edge" type="number" min="0" max="50" step="0.5" value="5"></div><div class="setting-row"><label for="minHistory">Minimum prior matches before a prediction</label><input id="minHistory" type="number" min="0" max="1000" step="1" value="100"></div><p class="small">Flat stake: 1 unit per qualifying bet. Edge rule: model probability must be greater than implied probability plus the selected edge.</p></div>
+<div class="panel wide"><h2>3. Overall results</h2><div class="stats"><div class="stat"><div class="label">Matches tested</div><div class="value" id="matches">—</div><div class="hint">After minimum history</div></div><div class="stat"><div class="label">1X2 accuracy</div><div class="value" id="accuracy">—</div><div class="hint">Most likely H / D / A</div></div><div class="stat"><div class="label">O2.5 accuracy</div><div class="value" id="o25accuracy">—</div><div class="hint">Probability threshold 50%</div></div><div class="stat"><div class="label">Value bets</div><div class="value" id="bets">—</div><div class="hint">Across available book prices</div></div></div></div>
+<div class="panel wide"><h2>4. Bookmaker performance</h2><p class="small">Each bookmaker is evaluated independently. Straight Win backs the model's most likely 1X2 outcome at that bookmaker's matching price. Over 2.5 uses that bookmaker's Over 2.5 price. ROI = net profit ÷ total stakes.</p><div class="table-wrap"><table><thead><tr><th>Bookmaker</th><th>1X2 bets</th><th>1X2 wins</th><th>1X2 profit</th><th>1X2 ROI</th><th>O2.5 bets</th><th>O2.5 wins</th><th>O2.5 profit</th><th>O2.5 ROI</th></tr></thead><tbody id="bookRows"><tr><td colspan="9" class="neutral">Run a backtest to see bookmaker results.</td></tr></tbody></table></div></div>
+<div class="panel half"><h2>5. Market model performance</h2><div class="table-wrap"><table><thead><tr><th>Market</th><th>Predictions</th><th>Correct</th><th>Accuracy</th></tr></thead><tbody id="marketRows"><tr><td colspan="4" class="neutral">No results yet.</td></tr></tbody></table></div></div>
+<div class="panel half"><h2>6. Data quality</h2><div id="dataInfo" class="muted">No data loaded.</div></div>
+</section>
+<p class="foot">Model note: an independent Poisson baseline estimates expected home and away goals from prior team scoring/conceding rates with league-average smoothing. This is a historical research tool, not a guarantee of future results. Missing odds are skipped; no bookmaker odds are invented.</p>
+</main>
+<script>
+'use strict';
+const BOOKS=[['Bet365','bet365'],['Pinnacle','pinnacle'],['1xBet','1xbet'],['SportyBet','sportybet'],['Bet9ja','bet9ja'],['Stake','stake'],['Hard Rock Bet','hardrock']];
+const REQUIRED=['date','league','home','away','home_goals','away_goals'];
+const ALIASES={date:['date','match_date','matchdate'],league:['league','competition','tournament','division'],home:['home','home_team','hometeam'],away:['away','away_team','awayteam'],home_goals:['home_goals','fthg','fthome','hg','home_score'],away_goals:['away_goals','ftag','ftaway','ag','away_score']};
+let loadedRows=[];let lastResult=null;
+const $=id=>document.getElementById(id);
+function setStatus(msg,kind=''){ $('status').textContent=msg;$('status').className='status '+kind; }
+function norm(s){return String(s??'').trim().toLowerCase().replace(/[\s\-]+/g,'_');}
+function parseCSV(text){const rows=[];let row=[],field='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){field+='"';i++;}else if(c==='"')quoted=false;else field+=c;}else if(c==='"')quoted=true;else if(c===','){row.push(field);field='';}else if(c==='\n'){row.push(field);rows.push(row);row=[];field='';}else if(c!=='\r')field+=c;}if(field.length||row.length){row.push(field);rows.push(row);}if(!rows.length)throw Error('The CSV is empty.');const headers=rows.shift().map(norm);return rows.filter(r=>r.some(v=>String(v??'').trim()!=='')).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]??'');return o;});}
+function pick(obj,names){for(const n of names){const k=norm(n);if(obj[k]!==undefined&&String(obj[k]).trim()!=='')return obj[k];}return '';}
+function dateValue(v){const s=String(v??'').trim();if(!s)return null;let d=new Date(s);if(!Number.isFinite(d.getTime())&&/^\d{4}$/.test(s))d=new Date(Number(s),0,1);return Number.isFinite(d.getTime())?d.toISOString().slice(0,10):null;}
+function number(v){if(v===null||v===undefined||String(v).trim()==='')return null;const n=Number(String(v).trim());return Number.isFinite(n)?n:null;}
+function normalizeRows(raw){return raw.map((r,i)=>{const date=dateValue(pick(r,ALIASES.date));const league=String(pick(r,ALIASES.league)||'All competitions').trim();const home=String(pick(r,ALIASES.home)).trim();const away=String(pick(r,ALIASES.away)).trim();const hg=number(pick(r,ALIASES.home_goals));const ag=number(pick(r,ALIASES.away_goals));if(!date||!home||!away||hg===null||ag===null||hg<0||ag<0)return null;const out={date,league,home,away,hg,ag,odds:{}};for(const [label,prefix] of BOOKS){const get=(suffix,aliases=[])=>number(pick(r,[`${prefix}_${suffix}`,...aliases]));out.odds[prefix]={home:get('home',[`${prefix}_1`,`odd_${prefix}_home`]),draw:get('draw',[`${prefix}_x`,`odd_${prefix}_draw`]),away:get('away',[`${prefix}_2`,`odd_${prefix}_away`]),o25:get('o25',[`${prefix}_over25`,`${prefix}_over_2_5`,`${prefix}_over_2.5`])};}return out;}).filter(Boolean).sort((a,b)=>a.date.localeCompare(b.date));}
+function poisson(lambda,k){let p=Math.exp(-lambda);for(let i=1;i<=k;i++)p*=lambda/i;return p;}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function aggregate(){return {n:0,homeGoals:0,awayGoals:0};}
+function teamAggregate(){return {n:0,scored:0,conceded:0};}
+function addMatchToStats(m,stats){
+  stats.global.n++;stats.global.homeGoals+=m.hg;stats.global.awayGoals+=m.ag;
+  let lg=stats.leagues.get(m.league);if(!lg){lg=aggregate();stats.leagues.set(m.league,lg);}lg.n++;lg.homeGoals+=m.hg;lg.awayGoals+=m.ag;
+  let hs=stats.homeTeams.get(m.home);if(!hs){hs=teamAggregate();stats.homeTeams.set(m.home,hs);}hs.n++;hs.scored+=m.hg;hs.conceded+=m.ag;
+  let as=stats.awayTeams.get(m.away);if(!as){as=teamAggregate();stats.awayTeams.set(m.away,as);}as.n++;as.scored+=m.ag;as.conceded+=m.hg;
+}
+function estimateFast(stats,match){
+  const g=stats.global;const lg=stats.leagues.get(match.league);const base=lg&&lg.n?lg:g;
+  const globalHome=base.n?base.homeGoals/base.n:1.35;
+  const globalAway=base.n?base.awayGoals/base.n:1.10;
+  const globalTotal=(globalHome+globalAway)/2;const smooth=5;
+  const h=stats.homeTeams.get(match.home)||teamAggregate();
+  const a=stats.awayTeams.get(match.away)||teamAggregate();
+  const hScored=(h.scored+globalTotal*smooth)/(h.n+smooth);
+  const hConceded=(h.conceded+globalTotal*smooth)/(h.n+smooth);
+  const aScored=(a.scored+globalTotal*smooth)/(a.n+smooth);
+  const aConceded=(a.conceded+globalTotal*smooth)/(a.n+smooth);
+  const homeRate=clamp(globalHome*((hScored/Math.max(.25,globalHome))*(aConceded/Math.max(.25,globalHome))),.15,4.5);
+  const awayRate=clamp(globalAway*((aScored/Math.max(.25,globalAway))*(hConceded/Math.max(.25,globalAway))),.15,4.5);
+  const hp=[],ap=[];for(let k=0;k<=10;k++){hp[k]=poisson(homeRate,k);ap[k]=poisson(awayRate,k);}
+  let ph=0,pd=0,pa=0,under25=0;
+  for(let i=0;i<=10;i++)for(let j=0;j<=10;j++){const prob=hp[i]*ap[j];if(i>j)ph+=prob;else if(i===j)pd+=prob;else pa+=prob;if(i+j<=2)under25+=prob;}
+  const sum=ph+pd+pa;return {ph:ph/sum,pd:pd/sum,pa:pa/sum,o25:clamp(1-under25,0,1)};
+}
+function freshBook(){return {xBets:0,xWins:0,xProfit:0,oBets:0,oWins:0,oProfit:0};}
+function validOdds(v){return v!==null&&v>1&&v<1000;}
+async function runBacktest(rows){
+  const edge=clamp(Number($('edge').value)||0,0,50)/100;
+  const minHistory=Math.max(0,Math.floor(Number($('minHistory').value)||0));
+  const stats={global:aggregate(),leagues:new Map(),homeTeams:new Map(),awayTeams:new Map()};
+  const books=Object.fromEntries(BOOKS.map(([,p])=>[p,freshBook()]));
+  let tested=0,xCorrect=0,oCorrect=0,xPred=0,oPred=0,totalBets=0,skippedEarly=0;
+  const days=[];for(let i=0;i<rows.length;){let j=i+1;while(j<rows.length&&rows[j].date===rows[i].date)j++;days.push([i,j]);i=j;}
+  let processed=0;
+  for(let d=0;d<days.length;d++){
+    const [begin,end]=days[d];
+    // Every fixture on a date is predicted from strictly earlier dates only.
+    for(let i=begin;i<end;i++){
+      const m=rows[i];
+      if(stats.global.n<minHistory){skippedEarly++;continue;}
+      const probs=estimateFast(stats,m);tested++;
+      const predicted=probs.ph>=probs.pd&&probs.ph>=probs.pa?'home':probs.pd>=probs.pa?'draw':'away';
+      const actual=m.hg>m.ag?'home':m.hg===m.ag?'draw':'away';
+      xPred++;if(predicted===actual)xCorrect++;
+      const oPredicted=probs.o25>=.5;oPred++;if(oPredicted===(m.hg+m.ag>=3))oCorrect++;
+      for(const [,prefix] of BOOKS){
+        const b=books[prefix],od=m.odds[prefix];
+        const xOdds=od[predicted];const pKey=predicted==='home'?'ph':predicted==='draw'?'pd':'pa';
+        if(validOdds(xOdds)&&probs[pKey]>1/xOdds+edge){b.xBets++;totalBets++;if(predicted===actual){b.xWins++;b.xProfit+=xOdds-1;}else b.xProfit-=1;}
+        if(validOdds(od.o25)&&probs.o25>1/od.o25+edge){b.oBets++;totalBets++;if(m.hg+m.ag>=3){b.oWins++;b.oProfit+=od.o25-1;}else b.oProfit-=1;}
+      }
+    }
+    // Add this date only after all its predictions are complete.
+    for(let i=begin;i<end;i++)addMatchToStats(rows[i],stats);
+    processed+=end-begin;
+    if(processed>=5000||d===days.length-1){setStatus(`Testing historical data: ${processed.toLocaleString()} of ${rows.length.toLocaleString()} matches processed (${Math.round(processed/rows.length*100)}%).`);await new Promise(resolve=>setTimeout(resolve,0));processed=0;}
+  }
+  return {tested,xCorrect,xPred,oCorrect,oPred,books,totalBets,skippedEarly,days:days.length,rows:rows.length};
+}
+function pct(n,d){return d?(100*n/d).toFixed(1)+'%':'—';}function money(n){return (n>=0?'+':'')+n.toFixed(2)+'u';}function roi(p,b){return b?p/b*100:0;}function cls(n){return n>0?'positive':n<0?'negative':'neutral';}
+function render(res){$('matches').textContent=res.tested.toLocaleString();$('accuracy').textContent=pct(res.xCorrect,res.xPred);$('o25accuracy').textContent=pct(res.oCorrect,res.oPred);$('bets').textContent=res.totalBets.toLocaleString();$('bookRows').innerHTML=BOOKS.map(([name,p])=>{const b=res.books[p];const xr=roi(b.xProfit,b.xBets),orr=roi(b.oProfit,b.oBets);return `<tr><td>${name}</td><td>${b.xBets}</td><td>${b.xWins}</td><td class="${cls(b.xProfit)}">${money(b.xProfit)}</td><td class="${cls(xr)}">${b.xBets?xr.toFixed(1)+'%':'—'}</td><td>${b.oBets}</td><td>${b.oWins}</td><td class="${cls(b.oProfit)}">${money(b.oProfit)}</td><td class="${cls(orr)}">${b.oBets?orr.toFixed(1)+'%':'—'}</td></tr>`;}).join('');$('marketRows').innerHTML=`<tr><td>Straight Win (1X2)</td><td>${res.xPred}</td><td>${res.xCorrect}</td><td>${pct(res.xCorrect,res.xPred)}</td></tr><tr><td>Over 2.5 Goals</td><td>${res.oPred}</td><td>${res.oCorrect}</td><td>${pct(res.oCorrect,res.oPred)}</td></tr>`;$('dataInfo').innerHTML=`<p><strong>${res.rows.toLocaleString()}</strong> valid matches loaded across <strong>${res.days}</strong> match dates.</p><p><strong>${res.skippedEarly.toLocaleString()}</strong> matches skipped because they occurred before the minimum history requirement.</p><p>Odds are evaluated independently for each bookmaker. Missing or invalid prices are ignored.</p>`;}
+async function run(){if(!loadedRows.length)return;const btn=$('runBtn');btn.disabled=true;btn.textContent='Testing…';try{if(Number($('minHistory').value)<0||Number($('edge').value)<0)throw Error('Settings must be zero or greater.');setStatus(`Preparing ${loadedRows.length.toLocaleString()} matches for chronological testing…`);await new Promise(resolve=>setTimeout(resolve,0));const result=await runBacktest(loadedRows);lastResult=result;render(result);setStatus(`Backtest complete. ${result.tested.toLocaleString()} matches tested; ${result.totalBets.toLocaleString()} qualifying bookmaker bets found.`, 'good');}catch(e){setStatus(e.message,'bad');}finally{btn.disabled=!loadedRows.length;btn.textContent='Run walk-forward test';}}
+function csvEscape(v){const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function download(name,content,type='text/csv'){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function template(){const headers=[...REQUIRED];for(const [,p] of BOOKS)headers.push(`${p}_home`,`${p}_draw`,`${p}_away`,`${p}_o25`);const sample=['2025-01-01','Example League','Home FC','Away FC','2','1',...BOOKS.flatMap(()=>['2.10','3.30','3.60','1.95'])];download('15games_phase1_csv_template.csv',[headers.join(','),sample.map(csvEscape).join(',')].join('\n'));}
+function demo(){const teams=['North FC','South United','City Athletic','Rovers','Dynamo','Wanderers','County','Olympic'];const arr=[];for(let i=0;i<180;i++){const h=teams[i%teams.length],a=teams[(i*3+2)%teams.length];if(h===a)continue;const hg=(i*7+i%4)%4,ag=(i*5+i%3)%3;const row={date:new Date(Date.UTC(2024,0,1+i)).toISOString().slice(0,10),league:'Demo League',home:h,away:a,hg,ag,odds:{}};for(let j=0;j<BOOKS.length;j++){const p=BOOKS[j][1];row.odds[p]={home:2.1+(j*.02),draw:3.2+(j*.02),away:3.5+(j*.02),o25:1.9+(j*.015)};}arr.push(row);}loadedRows=arr;$('runBtn').disabled=false;setStatus('Demo data loaded. This is synthetic data for checking the dashboard only; it is not real match history or bookmaker prices.','good');$('dataInfo').textContent=`${arr.length} synthetic demo matches loaded. Results from demo data must not be treated as evidence of betting performance.`;}
+$('csvFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const raw=parseCSV(await f.text());if(!raw.length)throw Error('No match rows found in the CSV.');const first=raw[0];const missing=REQUIRED.filter(k=>!pick(first,ALIASES[k]));if(missing.length)throw Error('Missing required columns or values: '+missing.join(', ')+'. Check the CSV template.');const normalized=normalizeRows(raw);if(!normalized.length)throw Error('No valid rows. Check dates, team names and final-score columns.');loadedRows=normalized;$('runBtn').disabled=false;setStatus(`Loaded ${normalized.length.toLocaleString()} valid matches from ${f.name}. Ready to run.`, 'good');$('dataInfo').textContent=`${normalized.length.toLocaleString()} valid matches loaded. Dates: ${normalized[0].date} to ${normalized[normalized.length-1].date}.`; }catch(err){loadedRows=[];$('runBtn').disabled=true;setStatus(err.message,'bad');}});
+$('runBtn').addEventListener('click',run);$('templateBtn').addEventListener('click',template);$('sampleBtn').addEventListener('click',demo);
+</script></body></html>
