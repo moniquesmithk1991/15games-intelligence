@@ -287,10 +287,11 @@ $('run').onclick = async () => {
 function pct(x){return (100*x).toFixed(1)+'%'}
 function renderTests(skipped,total){
  const scoreKpis=$('scoreKpis'),scoreLeagueTable=$('scoreLeagueTable');
+ const scorePct=(arr,n)=>arr.length?pct(arr.filter(x=>x.scoreRank>0&&x.scoreRank<=n).length/arr.length):'—';
  const dcPct=n=>tests.length?pct(tests.filter(x=>x.dcRank>0&&x.dcRank<=n).length/tests.length):'—';
  const avgLog=key=>tests.length?(tests.reduce((sum,x)=>sum-Math.log(Math.max(1e-12,x[key])),0)/tests.length).toFixed(4):'—';
  $('dcComparison').innerHTML='<table><thead><tr><th>Model</th><th>Top-1 exact</th><th>Top-3</th><th>Top-5</th><th>Exact-score log loss ↓</th></tr></thead><tbody><tr><td>V4 Poisson baseline</td><td>'+scorePct(tests,1)+'</td><td>'+scorePct(tests,3)+'</td><td>'+scorePct(tests,5)+'</td><td>'+avgLog('poissonActual')+'</td></tr><tr><td>V5 Dixon–Coles (rho -0.10)</td><td>'+dcPct(1)+'</td><td>'+dcPct(3)+'</td><td>'+dcPct(5)+'</td><td>'+avgLog('dcActual')+'</td></tr></tbody></table>';
- const scorePct=(arr,n)=>arr.length?pct(arr.filter(x=>x.scoreRank>0&&x.scoreRank<=n).length/arr.length):'—';
+
  scoreKpis.innerHTML=[['Top-1 exact score',scorePct(tests,1)],['Top-3 coverage',scorePct(tests,3)],['Top-5 coverage',scorePct(tests,5)],['Tests evaluated',tests.length.toLocaleString()]].map(([label,value])=>'<div class="kpi"><b>'+value+'</b><small>'+label+'</small></div>').join('');
  const scoreGroups=new Map();for(const x of tests){if(!scoreGroups.has(x.league))scoreGroups.set(x.league,[]);scoreGroups.get(x.league).push(x)}
  scoreLeagueTable.innerHTML='<table><thead><tr><th>Competition</th><th>Matches</th><th>Top-1 exact</th><th>Top-3</th><th>Top-5</th></tr></thead><tbody>'+[...scoreGroups].sort((a,b)=>b[1].length-a[1].length).map(([lg,arr])=>'<tr><td>'+esc(lg)+'</td><td>'+arr.length+'</td><td>'+scorePct(arr,1)+'</td><td>'+scorePct(arr,3)+'</td><td>'+scorePct(arr,5)+'</td></tr>').join('')+'</tbody></table>';
