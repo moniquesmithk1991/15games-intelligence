@@ -324,7 +324,7 @@ function renderLeagueSelection(val,evaluation){
 $('exportLeague').onclick=()=>{
  if(!leagueEvalRows.length)return;
  const cols=['league','model','validation','evaluation','validationLoss','evaluationLoss','baselineLoss','top1','top3','top5'];
- const csv=[cols.join(','),...leagueEvalRows.map(r=>cols.map(k=>String(r[k]).includes(',')?'"'+String(r[k]).replace(/"/g,'""')+'"':r[k]).join(','))].join('\\n');
+ const csv=[cols.join(','),...leagueEvalRows.map(r=>cols.map(k=>String(r[k]).includes(',')?'"'+String(r[k]).replace(/"/g,'""')+'"':r[k]).join(','))].join('\n');
  csvDownload('15games_v8_league_evaluation.csv',csv);
 };
 
