@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>15GAMES Intelligence — Smart Top 5 Selector</title>
+<title>15GAMES Intelligence — Smart Top 5 Selector (Odds Audit)</title>
 <style>
 :root{color-scheme:dark;--bg:#0a1020;--panel:#121b2e;--panel2:#1a2740;--line:#2b3b57;--text:#eef4ff;--muted:#a6b4ca;--green:#52dda0;--amber:#f4c66f;--red:#ff8989;--blue:#8dbaff}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#09101e,#101c30 65%,#0a1020);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -372,6 +372,8 @@ function renderDaily(){
 $('dailyRun').onclick=renderDaily;
 
 function runSmart(){
+ // Odds audit: parsed odds are stored as oh/od/oa and copied into tests via {...f}.
+
  const out=$('smartStats'),period=$('smartPeriods'),recent=$('smartRecent');
  if(!tests.length){out.innerHTML='<p class="muted">Import the CSV and run walk-forward backtest first.</p>';return;}
  const allDates=[...new Set(matches.map(x=>x.date))].sort(),cut70=allDates[Math.floor(allDates.length*.70)],cut85=allDates[Math.floor(allDates.length*.85)];
@@ -381,6 +383,7 @@ function runSmart(){
  const global=dev.length?dev.filter(t=>t.scoreRank===1).length/dev.length:.12;
  const min=Number($('smartMin').value),limit=Number($('smartCount').value);
  const allOdds=tests.filter(t=>[t.oh,t.od,t.oa].every(x=>typeof x==='number'&&Number.isFinite(x)&&x>1)).length;
+ const importedOdds=matches.filter(t=>[t.oh,t.od,t.oa].every(x=>typeof x==='number'&&Number.isFinite(x)&&x>1)).length;
  const strategies=[
  {name:'Agreement-first',agree:0.055,odds:0.012,league:0.20},
  {name:'Probability-first',agree:0.018,odds:0.006,league:0.10},
@@ -423,7 +426,7 @@ function runSmart(){
  const chosen=trials[0],groups=[['Development',dev],['Validation',val],['Evaluation',ev]];
  const rows=groups.map(([name,data])=>{const z=summarize(candidates(data,chosen));return '<tr><td>'+name+'</td><td>'+z.n+'</td><td>'+z.h+'</td><td>'+(z.n?pct(z.h/z.n):'—')+'</td><td>'+z.three+' / '+z.full+'</td><td>'+z.perfect+' / '+z.full+'</td><td>'+z.odds+'</td></tr>';});
  const selected=groups.flatMap(([,data])=>candidates(data,chosen));const total=summarize(selected);
- out.innerHTML=[['Backtested matches with 1X2 odds',allOdds.toLocaleString()],['Validation-selected strategy',chosen.name],['Overall exact-score accuracy',total.n?pct(total.h/total.n):'—'],['Total selected matches',total.n.toLocaleString()],['Days with 3+ of 5',total.three+' / '+total.full],['Picks with usable odds',total.odds.toLocaleString()]].map(([k,v])=>'<div class="kpi"><b>'+esc(String(v))+'</b><small>'+k+'</small></div>').join('');
+ out.innerHTML=[['Odds audit version','2026-11-21'],['Imported matches with 1X2 odds',importedOdds.toLocaleString()],['Backtested matches with 1X2 odds',allOdds.toLocaleString()],['Validation-selected strategy',chosen.name],['Overall exact-score accuracy',total.n?pct(total.h/total.n):'—'],['Total selected matches',total.n.toLocaleString()],['Days with 3+ of 5',total.three+' / '+total.full],['Picks with usable odds',total.odds.toLocaleString()]].map(([k,v])=>'<div class="kpi"><b>'+esc(String(v))+'</b><small>'+k+'</small></div>').join('');
  period.innerHTML=(allOdds===0?'<div class="notice">No complete 1X2 odds found in the imported/backtested matches. The bookmaker agreement signal is disabled. Check CSV columns oddhome, odddraw, oddaway and ensure all three decimal prices exceed 1.</div>':'<p class="muted">Complete historical 1X2 odds available for '+allOdds.toLocaleString()+' backtested matches; bookmaker agreement affects ranking where available.</p>')+'<h3>Chronological results — validation strategy chosen before evaluation</h3><table><thead><tr><th>Period</th><th>Picks</th><th>Exact hits</th><th>Accuracy</th><th>3+ / full-five days</th><th>5 / full-five days</th><th>Odds available</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><h3>Strategy comparison on validation only</h3><table><thead><tr><th>Strategy</th><th>Picks</th><th>Hits</th><th>Accuracy</th></tr></thead><tbody>'+trials.map(s=>'<tr><td>'+esc(s.name)+'</td><td>'+s.validation.n+'</td><td>'+s.validation.h+'</td><td>'+(s.validation.n?pct(s.validation.h/s.validation.n):'—')+'</td></tr>').join('')+'</tbody></table><p class="muted">The evaluation set has been inspected in prior versions, so it is not a genuinely untouched holdout. Fresh future matches are required for independent confirmation. Scores shown are exact-score predictions, not betting recommendations.</p>';
  recent.innerHTML='<h3>Most recent 30 selected matches</h3><table><thead><tr><th>Date</th><th>Competition</th><th>Fixture</th><th>Predicted score</th><th>Combined probability</th><th>Model agreement</th><th>Actual</th><th>Result</th></tr></thead><tbody>'+selected.sort((a,b)=>b.t.date.localeCompare(a.t.date)).slice(0,30).map(x=>'<tr><td>'+esc(x.t.date)+'</td><td>'+esc(x.t.league)+'</td><td>'+esc(x.t.home)+' – '+esc(x.t.away)+'</td><td>'+x.p.h+'-'+x.p.a+'</td><td>'+pct(x.combined)+'</td><td>'+(x.same?'Yes':'No')+'</td><td>'+x.t.hg+'-'+x.t.ag+'</td><td>'+(x.hit?'HIT':'Miss')+'</td></tr>').join('')+'</tbody></table>';
 }
