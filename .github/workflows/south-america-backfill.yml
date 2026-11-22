@@ -1,0 +1,26 @@
+name: South America historical backfill
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Collect 2023–2026 monthly scoreboard windows
+        run: python scripts/backfill_south_america.py
+      - name: Commit historical dataset
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/south_america_matches.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Backfill South America match history"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
