@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-22T01:50:39.593601+00:00",
+  "updated_at": "2026-11-22T01:57:37.356010+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -483,5 +483,953 @@
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261129&limit=100"
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "league": "BRA1",
+      "month": "2023-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2023-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2024-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2025-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA1",
+      "month": "2026-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2023-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2024-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2025-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "BRA2",
+      "month": "2026-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2023-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2024-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2025-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG1",
+      "month": "2026-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2023-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2024-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-11",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2025-12",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-01",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-02",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-03",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-04",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-05",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-06",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-07",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-08",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-09",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-10",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "league": "ARG2",
+      "month": "2026-11",
+      "error": "HTTP Error 400: Bad Request"
+    }
+  ],
+  "backfill": {
+    "years": [
+      2023,
+      2026
+    ],
+    "observations": 0
+  }
 }
