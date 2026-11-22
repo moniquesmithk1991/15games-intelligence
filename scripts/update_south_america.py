@@ -21,7 +21,23 @@ for league,code in LEAGUES.items():
         score=lambda t: int(t["score"]) if str(t.get("score","")).isdigit() else None
         records.append({"id":str(e.get("id")),"league":league,"date":e.get("date"),"home":home.get("team",{}).get("displayName"),"away":away.get("team",{}).get("displayName"),"home_goals":score(home) if state=="post" else None,"away_goals":score(away) if state=="post" else None,"status":state,"source":"ESPN public scoreboard","source_url":url})
     except Exception as exc:errors.append({"league":league,"date":str(date),"error":str(exc)[:120]})
-unique={r["league"]+":"+r["id"]:r for r in records}
+# Preserve previously collected fixtures across rolling-window refreshes.
+previous={}
+if OUT.exists():
+  try:
+    for r in json.loads(OUT.read_text()).get("matches",[]):
+      if r.get("id") and r.get("league"):
+        previous[r["league"]+":"+str(r["id"])]=r
+  except (ValueError,OSError,TypeError):
+    pass
+unique=dict(previous)
+for r in records:
+  key=r["league"]+":"+r["id"]
+  old=unique.get(key)
+  # Never replace a completed result with a temporary non-final status.
+  if old and old.get("status")=="post" and r.get("status")!="post":
+    continue
+  unique[key]=r
 OUT.parent.mkdir(parents=True,exist_ok=True)
 OUT.write_text(json.dumps({"updated_at":datetime.datetime.now(datetime.timezone.utc).isoformat(),"source_type":"third-party ESPN, not official AFA/CBF","matches":sorted(unique.values(),key=lambda x:x["date"] or ""),"errors":errors},ensure_ascii=False,indent=2)+"\n")
 print(f"saved {len(unique)} matches; {len(errors)} request errors")
