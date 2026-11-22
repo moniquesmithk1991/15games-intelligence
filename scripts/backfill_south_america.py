@@ -4,7 +4,7 @@ Uses monthly scoreboard windows, preserving previous results and refusing incomp
 """
 import datetime,json,pathlib,urllib.request,time,os
 OUT=pathlib.Path("data/south_america_matches.json")
-LEAGUES={"BRA1":"bra.1","ARG1":"arg.1"}
+LEAGUES={"BRA1":"bra.1","BRA2":"bra.2","ARG1":"arg.1","ARG2":"arg.2"}
 START_YEAR=int(os.environ.get("START_YEAR","2023"))
 END_YEAR=int(os.environ.get("END_YEAR",str(datetime.datetime.now(datetime.timezone.utc).year)))
 if START_YEAR<2020 or END_YEAR>2030 or END_YEAR<START_YEAR:raise ValueError("Invalid year range")
