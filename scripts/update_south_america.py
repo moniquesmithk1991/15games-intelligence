@@ -2,7 +2,7 @@
 """Fetch ESPN public scoreboards for Brazil and Argentina; NOT an official federation feed."""
 import datetime,json,urllib.request,pathlib
 OUT=pathlib.Path("data/south_america_matches.json")
-LEAGUES={"BRA1":"bra.1","ARG1":"arg.1"}
+LEAGUES={"BRA1":"bra.1","BRA2":"bra.2","ARG1":"arg.1","ARG2":"arg.2"}
 today=datetime.datetime.now(datetime.timezone.utc).date()
 records=[];errors=[]
 for league,code in LEAGUES.items():
