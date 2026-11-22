@@ -1,6 +1,17 @@
 name: South America historical backfill
 on:
   workflow_dispatch:
+    inputs:
+      year:
+        description: 'Season to import'
+        required: true
+        default: '2026'
+        type: choice
+        options:
+          - '2026'
+          - '2025'
+          - '2024'
+          - '2023'
 permissions:
   contents: write
 jobs:
@@ -12,8 +23,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Collect 2023–2026 monthly scoreboard windows
+      - name: Collect selected season using daily requests
         run: python scripts/backfill_south_america.py
+        env:
+          START_YEAR: ${{ inputs.year }}
+          END_YEAR: ${{ inputs.year }}
       - name: Commit historical dataset
         run: |
           git config user.name "github-actions[bot]"
