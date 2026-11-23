@@ -1,0 +1,304 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>15GAMES V5 · Empirical scoring validation</title><style>body{font:15px system-ui;background:#0b1220;color:#eef4ff;max-width:1150px;margin:auto;padding:20px}section{background:#172238;border:1px solid #35445d;border-radius:12px;padding:18px;margin:16px 0}p,small{color:#c3d0e2}select,button{padding:10px;background:#2867ce;color:white;border:0;border-radius:7px;margin:4px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:9px;border-bottom:1px solid #35445d}a{color:#9dc7ff}.scroll{overflow:auto}.metric{display:inline-block;background:#243550;padding:12px;margin:5px;border-radius:8px}strong{color:#fff} .muted{color:#aabbd2}</style></head><body><nav style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px"><a href="15games_intelligence_mvp.html">Prediction Dashboard</a><a href="15games_intelligence_historical_lab_v7.html">Historical Lab</a><a href="15games_daily_top5.html">Daily Top 5</a></nav><h1>15GAMES · V5 Daily Fixtures</h1><p>Walk-forward evaluation using earlier matches only. Additional imported leagues use their latest available historical year (2025), not 2026; some leagues lack enough prior history for evaluation. Predictions for each fixture use only matches before its kickoff. This dashboard does not claim verified betting profitability.</p><section><h2>1 · Evaluation controls</h2><p id="feed">Loading historical results…</p><label>Competition <select id="league"><option value="BRA1">Brazil Série A</option><option value="BRA2">Brazil Série B</option><option value="ARG1">Argentina Primera</option><option value="ARG2">Argentina Primera Nacional</option><option value="ALL">All leagues with data</option></select></label><label>Minimum prior home/away fixtures <select id="minimum"><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option></select></label><button id="run">Run historical validation</button><p><strong>Additional South American leagues:</strong> Colombia (COL1), Chile (CHI1), Uruguay (URU1), Paraguay (PAR1), Peru (PER1), Ecuador (ECU1), Bolivia (BOL1), Venezuela (VEN1). To enable their predictions, import historical matches and fixtures in the same JSON format as the existing feed.</p><label>Import additional league JSON <input type="file" id="importLeague" accept=".json,application/json"></label><button id="clearImported">Clear imported league data</button><p id="importStatus" role="status">Published additional historical data loads automatically; optional manual JSON import remains available.</p><p id="status" role="status">Waiting for data…</p><p>V1: all-history Poisson, 3-match smoothing. V2: 90-day decay, 5-match smoothing, 12% draw boost. V3: 180-day decay, 5-match smoothing, no artificial draw boost, and a shrinkage blend of 75% team estimate + 25% league average expected goals. V5 tests a different empirical goal-count distribution, with team and opponent histories, league smoothing, and goal-rate adjustment. V5 was designed after viewing 2026 results and is not independently validated.</p></section><section><h2>2 · Same-fixture model comparison</h2><p>Only fixtures eligible for both V3 and V5 are evaluated. The fixed-score baseline always predicts 1–1; its Top-5 uses the five most frequent scorelines from the available pre-2026 training matches in each league. Lower H/D/A Brier is better. The models were examined against 2026 data during development, so 2026 is <strong>not an independent holdout</strong>. Prospective results are required.</p><div id="summary"></div><div class="scroll"><table><thead><tr><th>Method</th><th>Tested</th><th>Top-1 exact</th><th>Top-5 exact</th><th>H/D/A correct</th><th>H/D/A Brier ↓</th></tr></thead><tbody id="comparison"></tbody></table></div></section><section><h2>3 · Per-league and selective-coverage audit</h2><p>Top-score probability is NOT a validated confidence score. Compare higher-probability subsets against V3 on identical matches; selecting fewer matches can inflate hit rates by chance. Coverage is reported. No profitability claims.</p><div class="scroll"><table><thead><tr><th>League / subset</th><th>Fixtures</th><th>Coverage</th><th>V3 Top-1</th><th>V5 Top-1</th><th>V3 Top-5</th><th>V5 Top-5</th></tr></thead><tbody id="leagueAudit"></tbody></table></div></section><section><h2>3B · Probability calibration and league diagnostics</h2><p>For a well-calibrated exact-score model, outcomes assigned 10–15% probability should occur about 10–15% of the time. These bins are descriptive and selected after model development; small samples and league differences matter. Exact-score log loss is capped at a minimum probability of 0.000001. The same matches are used for V3 and V5.</p><div class="scroll"><table><thead><tr><th>League</th><th>Matches</th><th>V3 Top-1</th><th>V5 Top-1</th><th>V3 Top-5</th><th>V5 Top-5</th><th>V3 exact log loss ↓</th><th>V5 exact log loss ↓</th><th>V3 H/D/A Brier ↓</th><th>V5 H/D/A Brier ↓</th></tr></thead><tbody id="diagnostics"></tbody></table></div><h3>V3 and V5 top-score calibration (same fixtures)</h3><div class="scroll"><table><thead><tr><th>Model</th><th>Predicted top-score probability</th><th>Matches</th><th>Average forecast</th><th>Actual hit rate</th><th>Gap (actual − forecast)</th></tr></thead><tbody id="calibration"></tbody></table></div><p><strong>Important:</strong> the selective-coverage table above ranks matches using V5's predicted top-score probability. It does not establish betting value or predictability on future games. No bookmaker odds or returns are tested.</p></section><section><h2>3C · Prospective prediction ledger</h2><p>Save upcoming predictions <strong>before kickoff</strong> on this device. Enter verified final scores in the last column if the feed is delayed. When the historical feed later reports final scores, click Reconcile to score the saved predictions without regenerating them. Saved entries remain in this browser only and can be lost if site data is cleared. The ledger is an observational record, not independently timestamped or tamper-proof.</p><button id="saveForecast">Save currently listed upcoming fixtures</button><button id="reconcile">Refresh feed &amp; reconcile results</button><button id="exportLedger">Export ledger CSV</button><p id="ledgerStatus" role="status"></p><div class="scroll"><table><thead><tr><th>Saved UTC</th><th>Kickoff UTC</th><th>League</th><th>Fixture</th><th>V3 top score</th><th>V5 top score</th><th>Actual</th><th>V3 hit?</th><th>V5 hit?</th><th>Enter final score</th></tr></thead><tbody id="ledgerRows"></tbody></table></div><p id="ledgerSummary"></p></section><section><h2>4 · Predictions and actual scores</h2><p>Most recent 100 eligible target-year fixtures; all model scores were generated using earlier matches only.</p><div class="scroll"><table><thead><tr><th>Date</th><th>League</th><th>Fixture</th><th>Actual</th><th>V3</th><th>V5</th><th>V5 top 5?</th></tr></thead><tbody id="results"></tbody></table></div></section><section><h2>5 · Upload upcoming fixtures CSV · Original V3 vs empirical V5</h2><p>Upload your own upcoming fixtures. Required columns: <code>date,home,away</code> and <code>league</code> (or <code>country</code> with league). Optional: <code>kickoff_time_as_shown</code>. Your SofaScore combined CSV is accepted. Dates must be YYYY-MM-DD. Times remain as shown in your file (timezone unknown).</p><input id="fixtureUpload" type="file" accept=".csv,text/csv"><button id="fixtureClear" type="button">Clear uploaded fixtures</button><p id="fixtureStatus">No fixture CSV uploaded. Select a file above; the filename and import progress will appear here.</p><div class="scroll"><table><thead><tr><th>Date / shown kickoff</th><th>League</th><th>Match</th><th>Original V3 · top 15</th><th>Empirical V5 · top 15</th><th>Status</th></tr></thead><tbody id="fixtureRows"></tbody></table></div></section><section><p id="worldStatus">Loading live fixtures…</p><button id="worldRefresh" type="button">Refresh today’s fixtures</button><h2>5 · Today's fixtures · V3 versus V5</h2><p>Fixtures refresh daily from football scoreboards across multiple countries, with the existing 15GAMES odds feed as fallback. The same verified fixtures are compared side by side: original V3 Poisson versus original V5 empirical. Each column shows its own top correct score, probability and five score candidates. CSV V4 / Dixon-Coles-style V5 / V6 alternatives are labeled separately; they do not replace the original V3/V5. The target is at least 20 real fixtures, but actual daily schedules may contain fewer. No fabricated matches or scores.</p><div class="scroll"><table><thead><tr><th>Kickoff UTC</th><th>League</th><th>Fixture</th><th>V3 · Top 15</th><th>V5 empirical · Top 15</th><th>Coverage</th></tr></thead><tbody id="upcoming"></tbody></table></div></section><section><h2>Method and limitations</h2><p>Results are evaluated in chronological order, grouped by identical kickoff timestamps to avoid using simultaneous results. Each league maintains separate team histories. V5 uses smoothed weighted empirical histograms of team scoring and opponent conceding, with 240-day decay and bounded exponential tilt. This is a heuristic candidate, not a trained or calibrated machine-learning system. Team identifiers are used when present. Both models enumerate 0–10 goals per side and normalize score probabilities; V3 uses Poisson and V5 uses empirical distributions. A historical 1–1 baseline is included, alongside a training-frequency Top-5 benchmark. Coverage and skipped fixtures are reported explicitly. Repeated seasons may contain changed teams or competition structures. Before betting, validate V5 prospectively on matches not yet played and compare with bookmaker implied probabilities and fees.</p><p><a href="./15games_south_america_v3_validation.html">V3 benchmark</a> · <a href="./15games_south_america_correct_score_lab.html">V1/V2 original lab</a> · <a href="./15games_south_america_team_strengths.html">Team strengths</a></p></section><script>
+const $=id=>document.getElementById(id),escapeHtml=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let matches=[];let uploadedFixtures=[];let importedMatches=[];let currentForecast=[];const leagueLabels={BRA1:'Brazil Série A',BRA2:'Brazil Série B',ARG1:'Argentina Primera',ARG2:'Argentina Primera Nacional',COL1:'Colombia Primera A',CHI1:'Chile Primera',URU1:'Uruguay Primera',PAR1:'Paraguay Primera',PER1:'Peru Liga 1',ECU1:'Ecuador Serie A',BOL1:'Bolivia División Profesional',VEN1:'Venezuela Primera'};function availableLeagues(){return [...new Set(matches.map(m=>m.league))].filter(x=>leagueLabels[x]).sort((a,b)=>Object.keys(leagueLabels).indexOf(a)-Object.keys(leagueLabels).indexOf(b))}function refreshLeagues(){const select=$('league'),value=select.value;const ready=new Set(availableLeagues());select.innerHTML=Object.entries(leagueLabels).map(([id,label])=>'<option value="'+id+'">'+label+(ready.has(id)?'':' (awaiting data)')+'</option>').join('')+'<option value="ALL">All leagues with data</option>';select.value=(value==='ALL'||leagueLabels[value])?value:'ALL'}const ledgerKey='15games_v3_v5_prospective_ledger_v1';
+const valid=m=>m.status==='post'&&Number.isInteger(m.home_goals)&&Number.isInteger(m.away_goals);
+const key=(m,side)=>m[side+'_team_id']||m[side];
+const date=m=>String(m.date||'');
+const pct=n=>(100*n).toFixed(1)+'%';
+const fmt=s=>s.i+'–'+s.j;
+function stats(history,asof,mode){const teams=new Map();let home=0,away=0,wTotal=0;const half=mode==='v2'?90:mode==='v3'?180:Infinity;function team(id){if(!teams.has(id))teams.set(id,{hn:0,an:0,hnRaw:0,anRaw:0,hgf:0,hga:0,agf:0,aga:0});return teams.get(id)}for(const m of history){const w=Number.isFinite(half)?Math.pow(.5,Math.max(0,(Date.parse(asof)-Date.parse(m.date))/86400000)/half):1;const h=team(key(m,'home')),a=team(key(m,'away'));h.hn+=w;h.hnRaw++;h.hgf+=w*m.home_goals;h.hga+=w*m.away_goals;a.an+=w;a.anRaw++;a.agf+=w*m.away_goals;a.aga+=w*m.home_goals;home+=w*m.home_goals;away+=w*m.away_goals;wTotal+=w}return{teams,H:home/Math.max(wTotal,1),A:away/Math.max(wTotal,1)}}
+function predict(m,st,min,mode){const h=st.teams.get(key(m,'home')),a=st.teams.get(key(m,'away'));if(!h||!a||h.hnRaw<min||a.anRaw<min||st.H<=0||st.A<=0)return null;const n=mode==='v1'?3:5;const sm=(g,w,b)=>(g+n*b)/(w+n);const clamp=x=>Math.max(.2,Math.min(4,x));let xh=sm(h.hgf,h.hn,st.H)*sm(a.aga,a.an,st.H)/st.H,xa=sm(a.agf,a.an,st.A)*sm(h.hga,h.hn,st.A)/st.A;if(mode==='v3'){xh=.75*xh+.25*st.H;xa=.75*xa+.25*st.A}xh=clamp(xh);xa=clamp(xa);const ph=[Math.exp(-xh)],pa=[Math.exp(-xa)];for(let k=1;k<=10;k++){ph[k]=ph[k-1]*xh/k;pa[k]=pa[k-1]*xa/k}let scores=[],sum=0;for(let i=0;i<=10;i++)for(let j=0;j<=10;j++){const p=ph[i]*pa[j]*(mode==='v2'&&i===j?1.12:1);scores.push({i,j,p});sum+=p}for(const s of scores)s.p/=sum;scores.sort((a,b)=>b.p-a.p);let p1=0,px=0,p2=0;for(const s of scores){if(s.i>s.j)p1+=s.p;else if(s.i<s.j)p2+=s.p;else px+=s.p}return{xh,xa,scores,p1,px,p2}}
+
+// V5: empirical score-frequency model. No result at or after target kickoff is used.
+// Histograms blend each team's home/away goals for/against with league distributions.
+// Exponential tilting adjusts histogram means to the opponent-adjusted V3 xG.
+function empiricalDist(history,asof,m,side,lambda){
+ const homeSide=side==='home', teamId=key(m,side), opponentId=key(m,homeSide?'away':'home');
+ const scored=[],allowed=[],league=[];let teamN=0,oppN=0;
+ const decay=d=>Math.pow(.5,Math.max(0,(Date.parse(asof)-Date.parse(d))/86400000)/240);
+ for(const x of history){
+  const w=decay(date(x));const target=homeSide?'home':'away',other=homeSide?'away':'home';
+  league.push({g:x[target+'_goals'],w});
+  if(key(x,target)===teamId){scored.push({g:x[target+'_goals'],w});teamN++}
+  if(key(x,other)===opponentId){allowed.push({g:x[target+'_goals'],w});oppN++}
+ }
+ const hist=arr=>{const out=Array(11).fill(0);let total=0;for(const x of arr){out[Math.min(10,x.g)]+=x.w;total+=x.w}return{p:out.map(v=>total?v/total:0),total}};
+ const l=hist(league),t=hist(scored),o=hist(allowed);
+ const dist=Array.from({length:11},(_,k)=>{const base=l.p[k];const ts=(t.p[k]*t.total+8*base)/(t.total+8);const os=(o.p[k]*o.total+8*base)/(o.total+8);return .5*ts+.5*os});
+ // Tilt smoothly to the opponent-adjusted mean, without inventing new scores.
+ const mean=dist.reduce((a,v,k)=>a+k*v,0), tilt=Math.max(-.65,Math.min(.65,Math.log(Math.max(.25,lambda)/Math.max(.25,mean))*.7));
+ let probs=dist.map((v,k)=>v*Math.exp(tilt*k)),total=probs.reduce((a,b)=>a+b,0);
+ probs=probs.map(v=>v/total);
+ return{probs,teamN,oppN};
+}
+function predictV5(m,history,st,min){
+ const base=predict(m,st,min,'v3');if(!base)return null;
+ const home=empiricalDist(history,date(m),m,'home',base.xh),away=empiricalDist(history,date(m),m,'away',base.xa);
+ let scores=[],sum=0;for(let i=0;i<=10;i++)for(let j=0;j<=10;j++){const p=home.probs[i]*away.probs[j];scores.push({i,j,p});sum+=p}
+ if(sum<=0)return null;for(const x of scores)x.p/=sum;scores.sort((a,b)=>b.p-a.p);
+ let p1=0,px=0,p2=0;for(const x of scores){if(x.i>x.j)p1+=x.p;else if(x.i===x.j)px+=x.p;else p2+=x.p}
+ return{xh:base.xh,xa:base.xa,scores,p1,px,p2,scoreConfidence:scores[0].p};
+}
+
+function baseline(history){const counts=new Map();for(const m of history){const s=m.home_goals+'–'+m.away_goals;counts.set(s,(counts.get(s)||0)+1)}const top=[...counts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5).map(x=>x[0]);return top}
+function evaluate(){const started=performance.now(),league=$('league').value,min=+$('minimum').value,selected=league==='ALL'?availableLeagues():[league],models=['v3','v5'];let rows=[],skipped=0,total2026=0,baselineAvailable=0;for(const lg of selected){const completed=matches.filter(m=>m.league===lg&&valid(m)).sort((a,b)=>date(a).localeCompare(date(b))||String(a.id).localeCompare(String(b.id)));const targetYear=['COL1','ECU1','PAR1'].includes(lg)?'2025':'2026';const before2026=completed.filter(m=>date(m).slice(0,4)<targetYear),fixedTop=baseline(before2026);for(let i=0;i<completed.length;){let j=i+1;while(j<completed.length&&date(completed[j])===date(completed[i]))j++;const group=completed.slice(i,j);if(date(group[0]).slice(0,4)===targetYear){total2026+=group.length;const history=completed.slice(0,i),computed={};computed.v3=stats(history,date(group[0]),'v3');for(const m of group){const pred={};pred.v3=predict(m,computed.v3,min,'v3');pred.v5=predictV5(m,history,computed.v3,min);if(models.some(mode=>!pred[mode])){skipped++;continue}const actual=m.home_goals+'–'+m.away_goals,actualClass=m.home_goals>m.away_goals?'H':m.home_goals<m.away_goals?'A':'D';rows.push({m,actual,actualClass,pred,baselineTop:fixedTop})}}i=j}}
+const measures={};for(const mode of ['baseline',...models]){let hit=0,top5=0,correct=0,brier=0;for(const r of rows){if(mode==='baseline'){hit+=r.actual==='1–1';top5+=r.baselineTop.includes(r.actual);continue}const p=r.pred[mode];hit+=fmt(p.scores[0])===r.actual;top5+=p.scores.slice(0,5).some(s=>fmt(s)===r.actual);const predicted=p.p1>=p.px&&p.p1>=p.p2?'H':p.p2>=p.px?'A':'D';correct+=predicted===r.actualClass;brier+=((p.p1-(r.actualClass==='H'))**2+(p.px-(r.actualClass==='D'))**2+(p.p2-(r.actualClass==='A'))**2)/3}const n=rows.length;measures[mode]={n,hit:n?hit/n:0,top5:n?top5/n:0,correct:mode==='baseline'?null:(n?correct/n:null),brier:mode==='baseline'?null:(n?brier/n:null)}}
+
+function auditRow(name,arr,denom){const n=arr.length;if(!n)return '';const rate=(mode,k)=>pct(arr.filter(r=>r.pred[mode].scores.slice(0,k).some(s=>fmt(s)===r.actual)).length/n);return '<tr><td>'+escapeHtml(name)+'</td><td>'+n+'</td><td>'+pct(n/denom)+'</td><td>'+rate('v3',1)+'</td><td>'+rate('v5',1)+'</td><td>'+rate('v3',5)+'</td><td>'+rate('v5',5)+'</td></tr>'}
+const all=rows.length;let audits=[];for(const lg of selected){const subset=rows.filter(r=>r.m.league===lg);if(subset.length)audits.push(auditRow(lg,subset,subset.length))}
+for(const fraction of [.5,.25,.1]){const ranked=[...rows].sort((a,b)=>b.pred.v5.scoreConfidence-a.pred.v5.scoreConfidence);const subset=ranked.slice(0,Math.max(1,Math.floor(all*fraction)));audits.push(auditRow('Top '+Math.round(fraction*100)+'% by V5 score probability',subset,all))}
+$('leagueAudit').innerHTML=audits.join('')||'<tr><td colspan="7">No eligible fixtures.</td></tr>';
+
+
+function diagnosticMetrics(arr,mode){const n=arr.length;if(!n)return null;let top1=0,top5=0,ll=0,brier=0;for(const r of arr){const p=r.pred[mode];const actual=r.actual;top1+=fmt(p.scores[0])===actual;top5+=p.scores.slice(0,5).some(x=>fmt(x)===actual);const found=p.scores.find(x=>fmt(x)===actual);ll-=Math.log(Math.max(.000001,found?.p||0));brier+=((p.p1-Number(r.actualClass==='H'))**2+(p.px-Number(r.actualClass==='D'))**2+(p.p2-Number(r.actualClass==='A'))**2)/3}return{top1:top1/n,top5:top5/n,ll:ll/n,brier:brier/n}}
+$('diagnostics').innerHTML=selected.map(lg=>{const arr=rows.filter(r=>r.m.league===lg);if(!arr.length)return '';const a=diagnosticMetrics(arr,'v3'),b=diagnosticMetrics(arr,'v5');return '<tr><td>'+escapeHtml(lg)+'</td><td>'+arr.length+'</td><td>'+pct(a.top1)+'</td><td>'+pct(b.top1)+'</td><td>'+pct(a.top5)+'</td><td>'+pct(b.top5)+'</td><td>'+a.ll.toFixed(3)+'</td><td>'+b.ll.toFixed(3)+'</td><td>'+a.brier.toFixed(4)+'</td><td>'+b.brier.toFixed(4)+'</td></tr>'}).join('');
+const bins=[[0,.1],[.1,.125],[.125,.15],[.15,.175],[.175,.2],[.2,1.001]];
+$('calibration').innerHTML=['v3','v5'].flatMap(mode=>bins.map(([lo,hi])=>{const arr=rows.filter(r=>r.pred[mode].scores[0].p>=lo&&r.pred[mode].scores[0].p<hi);if(!arr.length)return '';const avg=arr.reduce((v,r)=>v+r.pred[mode].scores[0].p,0)/arr.length;const hit=arr.filter(r=>fmt(r.pred[mode].scores[0])===r.actual).length/arr.length;return '<tr><td>'+mode.toUpperCase()+'</td><td>'+pct(lo)+' to '+(hi>1?'100%':pct(hi))+'</td><td>'+arr.length+'</td><td>'+pct(avg)+'</td><td>'+pct(hit)+'</td><td>'+((hit-avg)*100).toFixed(1)+' pp</td></tr>'})).join('')||'<tr><td colspan="6">No data</td></tr>';
+
+$('summary').innerHTML='<div class="metric">Target-year completed <strong>'+total2026+'</strong></div><div class="metric">Common eligible fixtures <strong>'+rows.length+'</strong></div><div class="metric">Skipped <strong>'+skipped+'</strong></div><div class="metric">Historical training <strong>Earlier fixtures only</strong></div>';
+$('comparison').innerHTML=['baseline',...models].map(mode=>{const v=measures[mode];return '<tr><td>'+({baseline:'1–1 / historical Top-5',v1:'V1',v2:'V2',v3:'V3 (benchmark)',v5:'V5 (empirical candidate)'}[mode])+'</td><td>'+v.n+'</td><td>'+pct(v.hit)+'</td><td>'+pct(v.top5)+'</td><td>'+(v.correct===null?'—':pct(v.correct))+'</td><td>'+(v.brier===null?'—':v.brier.toFixed(4))+'</td></tr>'}).join('');
+$('results').innerHTML=rows.slice(-100).reverse().map(r=>'<tr><td>'+escapeHtml(date(r.m).slice(0,10))+'</td><td>'+escapeHtml(r.m.league)+'</td><td>'+escapeHtml(r.m.home)+' vs '+escapeHtml(r.m.away)+'</td><td>'+r.actual+'</td>'+models.map(mode=>'<td>'+fmt(r.pred[mode].scores[0])+'</td>').join('')+'<td>'+(r.pred.v5.scores.slice(0,5).some(s=>fmt(s)===r.actual)?'Yes':'No')+'</td></tr>').join('')||'<tr><td colspan="7">No fixtures eligible under this setting.</td></tr>';
+const futures=matches.filter(m=>selected.includes(m.league)&&m.status==='pre'&&date(m)>new Date().toISOString()).sort((a,b)=>date(a).localeCompare(date(b))).slice(0,30);let forecast=[];currentForecast=[];for(const m of futures){const prior=matches.filter(x=>x.league===m.league&&valid(x)&&date(x)<date(m));const p=predictV5(m,prior,stats(prior,date(m),'v3'),min);if(p){const v3=predict(m,stats(prior,date(m),'v3'),min,'v3');if(v3)currentForecast.push({id:String(m.id||''),date:date(m),league:m.league,home:m.home,away:m.away,homeId:String(key(m,'home')),awayId:String(key(m,'away')),v3:fmt(v3.scores[0]),v5:fmt(p.scores[0]),v3p:v3.scores[0].p,v5p:p.scores[0].p});forecast.push('<tr><td>'+escapeHtml(date(m).slice(0,16))+'</td><td>'+escapeHtml(m.league)+'</td><td>'+escapeHtml(m.home)+' vs '+escapeHtml(m.away)+'</td><td>'+p.xh.toFixed(2)+' / '+p.xa.toFixed(2)+'</td><td>'+p.scores.slice(0,5).map(s=>fmt(s)+' ('+pct(s.p)+')').join(', ')+'</td><td>'+[p.p1,p.px,p.p2].map(pct).join(' / ')+'</td><td>'+pct(p.scoreConfidence)+'</td></tr>')}}
+renderWorldwide();
+$('status').textContent=(rows.length?'✓ Evaluated '+rows.length+' fixtures in '+Math.round(performance.now()-started)+' ms. These are historical results, not prospective betting returns.':'No eligible test fixtures under this setting. This league may have only one historical season or no 2026 results.')}
+
+function ledgerRead(){try{return JSON.parse(localStorage.getItem(ledgerKey)||'[]')}catch{return []}}
+function ledgerWrite(x){localStorage.setItem(ledgerKey,JSON.stringify(x))}
+function ledgerId(x){return [x.league,x.date,x.homeId||x.home,x.awayId||x.away].join('|')}
+function renderLedger(){const data=ledgerRead().sort((a,b)=>b.saved.localeCompare(a.saved));$('ledgerRows').innerHTML=data.slice(0,300).map(x=>'<tr><td>'+escapeHtml(x.saved.slice(0,16))+'</td><td>'+escapeHtml(x.date.slice(0,16))+'</td><td>'+escapeHtml(x.league)+'</td><td>'+escapeHtml(x.home)+' vs '+escapeHtml(x.away)+'</td><td>'+escapeHtml(x.v3)+' ('+pct(x.v3p)+')</td><td>'+escapeHtml(x.v5)+' ('+pct(x.v5p)+')</td><td>'+escapeHtml(x.actual||'Pending')+'</td><td>'+(x.actual?(x.v3===x.actual?'Yes':'No'):'—')+'</td><td>'+(x.actual?(x.v5===x.actual?'Yes':'No'):'—')+'</td><td><input class="scoreInput" data-id="'+escapeHtml(ledgerId(x))+'" aria-label="Final score home-away" placeholder="e.g. 1-0" value="'+escapeHtml(x.actual||'')+'" style="width:78px;padding:7px;background:#0b1220;color:white;border:1px solid #7184a3;border-radius:5px"><button class="scoreSave" data-id="'+escapeHtml(ledgerId(x))+'">Save</button></td></tr>').join('')||'<tr><td colspan="10">No predictions saved yet.</td></tr>';const finished=data.filter(x=>x.actual);$('ledgerSummary').textContent='Saved: '+data.length+' · Final results: '+finished.length+' · V3 Top-1: '+(finished.length?pct(finished.filter(x=>x.v3===x.actual).length/finished.length):'—')+' · V5 Top-1: '+(finished.length?pct(finished.filter(x=>x.v5===x.actual).length/finished.length):'—')}
+$('ledgerRows').onclick=e=>{const btn=e.target.closest('.scoreSave');if(!btn)return;const inp=Array.from($('ledgerRows').querySelectorAll('.scoreInput')).find(el=>el.dataset.id===btn.dataset.id);const raw=inp.value.trim();const match=raw.match(/^(\\d{1,2})\\s*[-–:]\\s*(\\d{1,2})$/);if(!match){$('ledgerStatus').textContent='Enter a score such as 1-0, then press Save.';return}const score=Number(match[1])+'–'+Number(match[2]);const entries=ledgerRead();const row=entries.find(x=>ledgerId(x)===btn.dataset.id);if(!row)return;row.actual=score;row.resultSource='manual';ledgerWrite(entries);$('ledgerStatus').textContent='Saved final score '+score+' for '+row.home+' vs '+row.away+'.';renderLedger()};
+$('saveForecast').onclick=()=>{const now=new Date().toISOString(),existing=ledgerRead(),ids=new Set(existing.map(ledgerId));let added=0;for(const x of currentForecast){if(Date.parse(x.date)<=Date.now()||ids.has(ledgerId(x)))continue;existing.push({...x,saved:now,actual:null});ids.add(ledgerId(x));added++}ledgerWrite(existing);$('ledgerStatus').textContent='Saved '+added+' new pre-kickoff forecasts on this device.';renderLedger()};
+const sameMatch=(m,x)=>{if(!valid(m)||m.league!==x.league)return false;const a=Date.parse(date(m)),b=Date.parse(x.date);if(Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)>36*3600000)return false;const ids=String(key(m,'home'))===x.homeId&&String(key(m,'away'))===x.awayId;const names=String(m.home).trim().toLowerCase()===String(x.home).trim().toLowerCase()&&String(m.away).trim().toLowerCase()===String(x.away).trim().toLowerCase();return ids||names};
+$('reconcile').onclick=async()=>{const button=$('reconcile');button.disabled=true;$('ledgerStatus').textContent='Refreshing historical results feed…';try{const response=await fetch('./data/south_america_matches.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();matches=data.matches||[];const entries=ledgerRead();let updated=0;for(const x of entries){if(x.actual)continue;const m=matches.find(m=>sameMatch(m,x));if(m){x.actual=m.home_goals+'–'+m.away_goals;x.resultSource='feed';updated++}}ledgerWrite(entries);renderLedger();$('ledgerStatus').textContent=updated?'Updated '+updated+' final results from feed.': 'No new final scores in the published feed (updated '+(data.updated_at||'unknown')+'). You can enter final scores manually in the last column and press Save.'}catch(e){$('ledgerStatus').textContent='Could not refresh feed: '+e.message+'. Manual score entry is still available.'}finally{button.disabled=false}};
+$('exportLedger').onclick=()=>{const cols=['saved','date','league','home','away','v3','v3p','v5','v5p','actual'];const csv=[cols.join(','),...ledgerRead().map(x=>cols.map(k=>'"'+String(x[k]??'').replace(/"/g,'""')+'"').join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='15games_prospective_ledger.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+renderLedger();
+
+async function load(){try{const r=await fetch('./data/south_america_matches.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();let extra=[];try{const x=await fetch('./data/south_america_additional_matches.json?t='+Date.now(),{cache:'no-store'});if(x.ok){const v=await x.json();extra=v.matches||[]}}catch(e){console.warn('Additional historical feed unavailable',e)}matches=[...(j.matches||[]),...extra,...importedMatches];refreshLeagues();if(uploadedFixtures.length)renderUploadedFixtures();const years={};for(const m of matches){const y=date(m).slice(0,4);years[y]=(years[y]||0)+1}$('feed').textContent='Published '+j.updated_at+' · '+matches.length+' fixtures · years: '+Object.entries(years).sort().map(([y,n])=>y+' ('+n+')').join(', ')+' · '+(j.errors?.length||0)+' collection errors.';evaluate()}catch(e){$('status').textContent='Unable to load or evaluate data: '+e.message;console.error(e)}}
+$('importLeague').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const parsed=JSON.parse(await file.text());const rows=Array.isArray(parsed)?parsed:parsed.matches;if(!Array.isArray(rows))throw Error('Expected an array or an object containing matches[]');const allowed=new Set(['COL1','CHI1','URU1','PAR1','PER1','ECU1','BOL1','VEN1']);const clean=rows.filter(m=>allowed.has(m.league)&&m.home&&m.away&&Number.isFinite(Date.parse(m.date))&&((m.status==='post'&&Number.isInteger(m.home_goals)&&Number.isInteger(m.away_goals))||m.status==='pre'));if(!clean.length)throw Error('No valid additional-league matches found. Required: league, date (ISO UTC), home, away, status pre/post, and final goals for post');importedMatches=clean;const r=await fetch('./data/south_america_matches.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('Base feed HTTP '+r.status);const j=await r.json();matches=[...(j.matches||[]),...importedMatches];refreshLeagues();$('importStatus').textContent='Imported '+clean.length+' fixtures across '+new Set(clean.map(m=>m.league)).size+' new leagues for this page session. Not saved to GitHub or browser storage.';evaluate()}catch(err){$('importStatus').textContent='Import failed: '+err.message}};$('clearImported').onclick=async()=>{importedMatches=[];$('importLeague').value='';await load();$('importStatus').textContent='Imported league data cleared.'};
+$('run').onclick=()=>{try{evaluate()}catch(e){$('status').textContent='Evaluation failed: '+e.message;console.error(e)}};$('league').onchange=$('run').onclick;$('minimum').onchange=$('run').onclick;load();
+
+const WORLD_API='https://15games-intelligence-api.moniquesmithk1991.workers.dev';
+let worldwideEvents=[],worldwideDay='';
+const worldDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const worldDate=x=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(x));
+const normalizeTeam=x=>String(x||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\b(fc|cf|afc|sc|ac|club|football|futbol|de|the)\b/g,'').replace(/[^a-z0-9]/g,'');
+function worldLeague(sportKey){const k=String(sportKey||'').toLowerCase();return ({'bra.1':'BRA1','bra.2':'BRA2','arg.1':'ARG1',soccer_brazil_campeonato:'BRA1',soccer_brazil_serie_b:'BRA2',soccer_argentina_primera_division:'ARG1'})[k]||null}
+const CSV_LEAGUES={'eng.1':'E0','eng.2':'E1','esp.1':'SP1','ger.1':'D1','ita.1':'I1','fra.1':'F1','ned.1':'N1','por.1':'P1','bra.1':'BRA','arg.1':'ARG','usa.1':'USA','mex.1':'MEX','sco.1':'SC0','bel.1':'B1','tur.1':'T1','jpn.1':'JAP','aus.1':null,soccer_epl:'E0',soccer_spain_la_liga:'SP1',soccer_germany_bundesliga:'D1',soccer_italy_serie_a:'I1',soccer_france_ligue_one:'F1',soccer_brazil_campeonato:'BRA',soccer_argentina_primera_division:'ARG'};
+let csvHistory=[],csvByLeague=new Map(),csvLoaded=false;
+function csvOpenDb(){return new Promise((resolve,reject)=>{const req=indexedDB.open('15games-worldwide-history',1);req.onupgradeneeded=()=>req.result.createObjectStore('files');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function csvStore(value){const db=await csvOpenDb();return new Promise((resolve,reject)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').put(value,'historical_csv');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>reject(tx.error)})}
+async function csvRetrieve(){const db=await csvOpenDb();return new Promise((resolve,reject)=>{const tx=db.transaction('files','readonly'),q=tx.objectStore('files').get('historical_csv');q.onsuccess=()=>{db.close();resolve(q.result)};q.onerror=()=>reject(q.error)})}
+function csvParseLine(line){const a=[];let part='',quote=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(quote&&line[i+1]==='"'){part+='"';i++}else quote=!quote}else if(c===','&&!quote){a.push(part);part=''}else part+=c}a.push(part);return a}
+function csvParse(text){
+ const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/),head=csvParseLine(lines.shift()||'').map(x=>x.trim().toLowerCase()),idx=Object.fromEntries(head.map((x,i)=>[x,i]));
+ if(!['date','league','home','away','home_goals','away_goals'].every(x=>idx[x]!==undefined))throw Error('CSV needs date, league, home, away, home_goals, away_goals');
+ const by=new Map();let count=0,latest='';
+ for(const line of lines){if(!line.trim())continue;const a=csvParseLine(line),d=a[idx.date],l=a[idx.league],h=a[idx.home],v=a[idx.away],hg=Number(a[idx.home_goals]),ag=Number(a[idx.away_goals]);if(!d||!l||!h||!v||!Number.isFinite(hg)||!Number.isFinite(ag))continue;const row={d,h,v,hg,ag,hn:normalizeTeam(h),vn:normalizeTeam(v)};if(!by.has(l))by.set(l,[]);by.get(l).push(row);count++;if(d>latest)latest=d}
+ for(const rows of by.values())rows.sort((a,b)=>a.d.localeCompare(b.d));
+ return {by,count,latest};
+}
+function csvMatchName(name,rows){
+ const n=normalizeTeam(name),alias={'parissaintgermain':'parissg','parissaintgermainfc':'parissg','manchesterunited':'manunited','manchestercity':'mancity','newellsoldboys':'newells','stlouiscity':'stlouis','internacional':'internacional','saopaulo':'saopaulo','gimnasialaplata':'gimnasia','realbetis':'betis','realsociedad':'sociedad','athleticclub':'athbilbao','atleticomineiro':'atleticomg'};
+ const canonical=alias[n]||n,known=new Set();for(const x of rows){known.add(x.hn);known.add(x.vn)}
+ if(known.has(canonical))return canonical;if(known.has(n))return n;
+ const near=[...known].filter(x=>x.length>5&&canonical.length>5&&(x.includes(canonical)||canonical.includes(x)));
+ return near.length===1?near[0]:null;
+}
+function csvPoisson(lambda,k){let p=Math.exp(-lambda);for(let i=1;i<=k;i++)p*=lambda/i;return p}
+function csvForecast(event){
+ const league=CSV_LEAGUES[event.sport_key||event._sport];if(!league)return null;
+ const rows=(csvByLeague.get(league)||[]).filter(x=>x.d<event.commence_time.slice(0,10));if(rows.length<30)return null;
+ const hn=csvMatchName(event.home_team,rows),an=csvMatchName(event.away_team,rows);if(!hn||!an||hn===an)return null;
+ const home=rows.filter(x=>x.hn===hn),away=rows.filter(x=>x.vn===an);if(home.length<5||away.length<5)return null;
+ const avg=(list,key)=>list.reduce((t,x)=>t+x[key],0)/Math.max(1,list.length);
+ const lh=avg(rows,'hg'),la=avg(rows,'ag'),smooth=5;
+ const hfor=(home.reduce((t,x)=>t+x.hg,0)+smooth*lh)/(home.length+smooth);
+ const aagainst=(away.reduce((t,x)=>t+x.hg,0)+smooth*lh)/(away.length+smooth);
+ const afor=(away.reduce((t,x)=>t+x.ag,0)+smooth*la)/(away.length+smooth);
+ const hagainst=(home.reduce((t,x)=>t+x.ag,0)+smooth*la)/(home.length+smooth);
+ const xh=Math.max(.2,Math.min(4,lh?(.5*hfor+.5*aagainst):hfor));
+ const xa=Math.max(.2,Math.min(4,la?(.5*afor+.5*hagainst):afor));
+ const recentH=home.slice(-8),recentA=away.slice(-8);
+ const rh=recentH.length?avg(recentH,'hg'):xh,ra=recentA.length?avg(recentA,'ag'):xa;
+ function model(type){let scores=[],sum=0;const h=type==='V6'?.75*xh+.25*rh:xh,a=type==='V6'?.75*xa+.25*ra:xa;
+ for(let i=0;i<=7;i++)for(let j=0;j<=7;j++){let p=csvPoisson(h,i)*csvPoisson(a,j);
+ if(type==='V5'){const rho=-.08;if(i===0&&j===0)p*=1-h*a*rho;else if(i===0&&j===1)p*=1+h*rho;else if(i===1&&j===0)p*=1+a*rho;else if(i===1&&j===1)p*=1-rho}
+ scores.push({i,j,p});sum+=p}
+ scores.forEach(x=>x.p/=sum);scores.sort((a,b)=>b.p-a.p);return scores}
+ return {league,h:hn,a:an,xh,xa,v4:model('V4'),v5:model('V5'),v6:model('V6'),homeN:home.length,awayN:away.length};
+}
+async function csvInstall(raw){$('csvStatus').textContent='Reading historical matches…';const parsed=csvParse(raw);csvByLeague=parsed.by;csvLoaded=true;$('csvStatus').textContent=parsed.count.toLocaleString()+' matches · '+parsed.by.size+' competitions · latest '+parsed.latest+' · saved on this device';renderWorldwide();if(uploadedFixtures.length)renderUploadedFixtures();return parsed}
+$('worldCsv').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const raw=await f.text();await csvInstall(raw);await csvStore(raw);$('csvStatus').textContent+=' · stored for future visits'}catch(err){$('csvStatus').textContent='CSV import failed: '+err.message}});
+$('clearWorldCsv').onclick=async()=>{try{await csvStore(null);csvByLeague=new Map();csvLoaded=false;$('csvStatus').textContent='Saved CSV removed';renderWorldwide()}catch(e){$('csvStatus').textContent=e.message}};
+csvRetrieve().then(x=>x?csvInstall(x):$('csvStatus').textContent='No saved CSV yet — choose historical_matches.csv once').catch(e=>$('csvStatus').textContent='Browser storage unavailable: '+e.message);
+
+function correctFixtureMetadata(f){
+ const pair=[normalizeTeam(f.home),normalizeTeam(f.away)].join('|');
+ const fixes={
+ 'basaksehirfk|corumfk':['Türkiye','1. Lig'],
+ 'bodrumfk|vansporfk':['Türkiye','1. Lig']
+ };
+ const corrected=fixes[pair];return corrected?{...f,country:corrected[0],league:corrected[1],originalCountry:f.country,originalLeague:f.league}:f;
+}
+const fixtureLeague=(f)=>{
+ const c=normalizeTeam(f.country),l=normalizeTeam(f.league);
+ const maps=[
+ ['brazil','campeonatobrasileiroseriea','BRA1'],['brazil','campeonatobrasileiroserieb','BRA2'],
+ ['argentina','ligaprofesionaldefutbol','ARG1'],['argentina','primeradivision','ARG1'],
+ ['colombia','primeradivision','COL1'],['colombia','categoriaprimeraa','COL1'],
+ ['chile','primeradivision','CHI1'],['uruguay','primeradivision','URU1'],['uruguay','ligaaufuruguaya','URU1'],
+ ['paraguay','primeradivision','PAR1'],['peru','primeradivision','PER1'],
+ ['ecuador','seriea','ECU1'],['bolivia','divisionprofesional','BOL1'],
+ ['venezuela','primeradivision','VEN1']
+ ];const exact=maps.find(x=>c===x[0]&&l===x[1]);if(exact)return exact[2];
+ if(leagueLabels[f.league])return f.league;
+ return null;
+};
+const fixtureCSVLeague=(f)=>{
+ const c=normalizeTeam(f.country),l=normalizeTeam(f.league);
+ const m={'england:premierleague':'E0','spain:laliga':'SP1','spain:laliga2':'SP2','spain:laliga':'SP1','italy:seriea':'I1','italy:serieb':'I2','france:ligue1':'F1','france:ligue2':'F2','germany:bundesliga':'D1','germany:2bundesliga':'D2','netherlands:eredivisie':'N1','brazil:campeonatobrasileiroseriea':'BRA','argentina:ligaprofesionaldefutbol':'ARG','paraguay:primeradivisionclausura':'PAR','turkiye:trendyolsuperlig':'T1','turkey:trendyolsuperlig':'T1','sweden:allsvenskan':'SWE','denmark:danishsuperliga':'DEN','poland:ekstraklasa':'POL','romania:superligaromaniei':'ROM','japan:jleague':'JAP','usa:mls':'USA'};
+ return m[c+':'+l]||null;
+};
+function parseFixtureCSV(text){
+ const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim()),header=csvParseLine(lines.shift()||'').map(x=>x.trim().toLowerCase()),idx=Object.fromEntries(header.map((x,i)=>[x,i]));
+ if(!['date','home','away'].every(x=>idx[x]!==undefined)||!('league'in idx)&&!('country'in idx))throw Error('CSV must include date, home, away, and league or country');
+ const get=(a,k)=>idx[k]===undefined?'':(a[idx[k]]||'').trim(),out=[],seen=new Set();
+ for(const line of lines){const a=csvParseLine(line),f={date:get(a,'date'),time:get(a,'kickoff_time_as_shown')||get(a,'time'),country:get(a,'country'),league:get(a,'league'),home:get(a,'home'),away:get(a,'away')};
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(f.date)||!f.home||!f.away)continue;
+ const id=[f.date,f.country,f.league,f.home,f.away].map(normalizeTeam).join('|');if(seen.has(id))continue;seen.add(id);out.push(correctFixtureMetadata(f))}
+ return out;
+}
+let fixtureRenderToken=0;
+async function renderUploadedFixtures(){
+ const token=++fixtureRenderToken;
+ const el=$('fixtureRows');if(!el)return;
+ let eligible=0;const min=+$('minimum').value;
+ const top=x=>{const arr=x.scores.slice(0,15),sum=arr.reduce((v,y)=>v+y.p,0);return '<strong>Top 15 coverage: '+pct(sum)+'</strong><ol style="padding-left:24px;margin:6px 0">'+arr.map(y=>'<li>'+fmt(y)+' — '+pct(y.p)+'</li>').join('')+'</ol>'};
+ const output=[];
+ for(const f of uploadedFixtures){
+  if(token!==fixtureRenderToken)return;
+  if(output.length&&output.length%5===0){$('fixtureStatus').textContent='Calculating V3/V5: '+output.length+' / '+uploadedFixtures.length+' fixtures…';await new Promise(resolve=>setTimeout(resolve,0));if(token!==fixtureRenderToken)return}
+  const lg=fixtureLeague(f),cl=fixtureCSVLeague(f);
+  let hist=[],label='',home=f.home,away=f.away;
+  if(lg){
+   hist=matches.filter(x=>x.league===lg&&valid(x)&&date(x)<f.date);
+   const aliases={'newellsoldboys':'newells','gimnasiayesgrima':'gimnasia','saopaulo':'saopaulo'};
+   const resolve=n=>{const wanted=normalizeTeam(n),canonical=aliases[wanted]||wanted;const known=new Map();for(const x of hist)for(const side of ['home','away'])known.set(normalizeTeam(x[side]),x[side]);return known.get(canonical)||known.get(wanted)||null};
+   home=resolve(f.home)||f.home;away=resolve(f.away)||f.away;
+   label='Published original-model history';
+  }
+  if(!hist.length&&cl&&csvByLeague.has(cl)){
+   const source=csvByLeague.get(cl).filter(x=>x.d<f.date),hn=csvMatchName(f.home,source),an=csvMatchName(f.away,source);
+   if(hn&&an&&hn!==an){hist=source.map(x=>({date:x.d,home:x.hn,away:x.vn,home_goals:x.hg,away_goals:x.ag,status:'post'}));home=hn;away=an;label='Uploaded historical CSV · original V3/V5 formulas'}
+  }
+  let v3=null,v5=null;if(hist.length){const st=stats(hist,f.date,'v3'),m={date:f.date,home,away,league:lg||cl,status:'pre'};v3=predict(m,st,min,'v3');if(v3)v5=predictV5(m,hist,st,min)}
+  if(v3&&v5)eligible++;
+  const unavailable=hist.length?'Insufficient matching home/away team history':'No compatible historical league/team data';
+  output.push('<tr><td>'+escapeHtml(f.date+' '+f.time)+'</td><td>'+escapeHtml(f.country+' · '+f.league)+'</td><td>'+escapeHtml(f.home+' vs '+f.away)+'</td><td>'+(v3?top(v3):'—')+'</td><td>'+(v5?top(v5):'—')+'</td><td>'+escapeHtml(v3&&v5?label:unavailable)+'</td></tr>');
+ }
+ el.innerHTML=output.join('')||'<tr><td colspan="6">Upload an upcoming fixtures CSV above.</td></tr>';
+ $('fixtureStatus').textContent=uploadedFixtures.length+' unique fixtures uploaded · '+eligible+' have both original V3 and empirical V5 predictions · '+(uploadedFixtures.length-eligible)+' unavailable. '+(!csvLoaded?'For more league coverage, first import completed historical matches in the Historical CSV section.':'Historical CSV available for supported leagues.');
+}
+async function handleFixtureUpload(file){
+ const status=$('fixtureStatus');if(!file){status.textContent='No file selected. Choose a CSV file.';return}
+ status.textContent='Selected '+file.name+' ('+Math.ceil(file.size/1024)+' KB). Reading CSV…';
+ try{
+  const content=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(reader.error||Error('Could not read file'));reader.readAsText(file)});
+  const parsed=parseFixtureCSV(content);
+  if(!parsed.length)throw Error('No valid fixtures found. Check date format YYYY-MM-DD and column headings.');
+  uploadedFixtures=parsed;
+  status.textContent='Imported '+parsed.length+' fixtures from '+file.name+'. Calculating V3/V5; please wait…';
+  $('fixtureRows').innerHTML='<tr><td colspan="6">Processing '+parsed.length+' fixtures. Please wait…</td></tr>';
+  await new Promise(resolve=>setTimeout(resolve,40));
+  await renderUploadedFixtures();
+ }catch(err){status.textContent='Upload error: '+(err?.message||String(err));console.error('Fixture upload error',err)}
+}
+$('fixtureUpload').addEventListener('change',e=>handleFixtureUpload(e.currentTarget.files?.[0]));
+$('fixtureClear').onclick=()=>{uploadedFixtures=[];$('fixtureUpload').value='';renderUploadedFixtures()};
+$('minimum').addEventListener('change',()=>{if(uploadedFixtures.length)renderUploadedFixtures()});
+function renderWorldwide(){
+ const target=worldDay();worldwideDay=target;let shown=0,covered=0,rows=[];
+ const events=worldwideEvents.filter(e=>e.commence_time&&worldDate(e.commence_time)===target).sort((a,b)=>a.commence_time.localeCompare(b.commence_time));
+ const top15=x=>{const best=x.scores.slice(0,15),coverage=best.reduce((sum,y)=>sum+y.p,0);return '<div class="muted" style="margin-top:6px">Top 15 combined probability: '+pct(coverage)+'</div><ol style="margin:6px 0;padding-left:23px">'+best.map(y=>'<li>'+fmt(y)+' — '+pct(y.p)+'</li>').join('')+'</ol>'};
+ for(const event of events){
+  shown++;const league=worldLeague(event.sport_key||event._sport),home=event.home_team,away=event.away_team;
+  let v3=null,v5=null,source='Not enough matching V3/V5 history';
+  if(league){
+   const history=matches.filter(x=>x.league===league&&valid(x)&&date(x)<event.commence_time);
+   const aliases={'gimnasialaplata':'gimnasia','newellsoldboys':'newells','atleticomineiro':'atleticomg','vitoria':'vitoria','saopaulo':'saopaulo'};
+   function resolve(name){
+    const wanted=normalizeTeam(name),canonical=aliases[wanted]||wanted;
+    for(const x of history)for(const side of ['home','away']){
+     const n=normalizeTeam(x[side]);
+     if(n===wanted||n===canonical||(aliases[n]||n)===canonical)return {name:x[side],id:key(x,side)};
+    }
+    return null;
+   }
+   const h=resolve(home),a=resolve(away);
+   if(h&&a){
+    const m={date:event.commence_time,league,home:h.name,away:a.name,home_team_id:h.id,away_team_id:a.id,status:'pre'};
+    const st=stats(history,m.date,'v3'),min=+$('minimum').value;
+    v3=predict(m,st,min,'v3');v5=predictV5(m,history,st,min);
+    if(v3&&v5)source='Original V3 / empirical V5';
+   }
+  }
+  const available=!!(v3&&v5);if(available)covered++;
+  const cell=model=>model?'<strong>'+fmt(model.scores[0])+' ('+pct(model.scores[0].p)+')</strong><div class="muted" style="max-width:360px">'+top15(model)+'</div>':'<span class="muted">Unavailable</span>';
+  const csv=csvLoaded?csvForecast(event):null;
+  const csvText=csv?'<div class="muted" style="margin-top:7px">CSV alternatives — V4: '+csv.v4[0].i+'-'+csv.v4[0].j+'; DC-style V5: '+csv.v5[0].i+'-'+csv.v5[0].j+'; V6: '+csv.v6[0].i+'-'+csv.v6[0].j+'</div>':'';
+  rows.push('<tr><td>'+escapeHtml(event.commence_time.slice(0,16))+'</td><td>'+escapeHtml(event.sport_title||event._title||event.sport_key||'Soccer')+'</td><td>'+escapeHtml(home)+' vs '+escapeHtml(away)+csvText+'</td><td>'+cell(v3)+'</td><td>'+cell(v5)+'</td><td>'+escapeHtml(source)+'</td></tr>');
+ }
+ $('upcoming').innerHTML=rows.join('')||'<tr><td colspan="6">No verified fixtures returned for today. No matches have been invented.</td></tr>';
+ $('worldStatus').textContent=target+' (Eastern) · '+shown+' real worldwide fixtures · '+covered+' with BOTH V3 and V5 predictions · '+(shown-covered)+' without matching model history.'+(shown<20?' Fewer than the requested 20 were returned by the live sources.':'')+' Fixture feed refreshes on page open and date change.';
+}
+const ESPN_LEAGUES=[
+ ['eng.3','English League One'],['eng.4','English League Two'],['eng.5','English National League'],['esp.2','Spanish Segunda'],['ger.2','German 2. Bundesliga'],['ger.3','German 3. Liga'],['ita.2','Italian Serie B'],['fra.2','French Ligue 2'],['ned.2','Dutch Eerste Divisie'],['por.2','Portuguese Liga 2'],['sco.2','Scottish Championship'],['sco.3','Scottish League One'],['sco.4','Scottish League Two'],['arg.2','Argentina Primera Nacional'],['bra.3','Brazil Serie C'],['col.1','Colombia Primera A'],['chi.1','Chile Primera'],['uru.1','Uruguay Primera'],['par.1','Paraguay Primera'],['per.1','Peru Primera'],['ecu.1','Ecuador Serie A'],['bol.1','Bolivia Primera'],['ven.1','Venezuela Primera'],['crc.1','Costa Rica Primera'],['hon.1','Honduras Primera'],['gua.1','Guatemala Liga Nacional'],['slv.1','El Salvador Primera'],['jam.1','Jamaica Premier'],['uefa.conference','UEFA Conference League'],['uefa.nations','UEFA Nations League'],['uefa.champions_qual','UEFA Champions Qualifying'],['caf.champions','CAF Champions League'],['afc.champions','AFC Champions League'],['ksa.2','Saudi First Division'],['ind.1','Indian Super League'],['kor.1','Korean K League 1'],['chn.1','Chinese Super League'],['swe.1','Swedish Allsvenskan'],['nor.1','Norwegian Eliteserien'],['den.1','Danish Superliga'],['aut.1','Austrian Bundesliga'],['sui.1','Swiss Super League'],['gre.1','Greek Super League'],['pol.1','Polish Ekstraklasa'],['rou.1','Romanian Liga I'],['irl.1','Irish Premier Division'],['usa.usl.1','USL Championship'],
+ ['eng.1','English Premier League'],['eng.2','English Championship'],['esp.1','Spanish La Liga'],['ger.1','German Bundesliga'],['ita.1','Italian Serie A'],['fra.1','French Ligue 1'],['ned.1','Dutch Eredivisie'],['por.1','Portuguese Primeira Liga'],['uefa.champions','UEFA Champions League'],['uefa.europa','UEFA Europa League'],['bra.1','Brazil Serie A'],['bra.2','Brazil Serie B'],['arg.1','Argentina Primera'],['usa.1','MLS'],['mex.1','Mexico Liga MX'],['sco.1','Scottish Premiership'],['bel.1','Belgian Pro League'],['tur.1','Turkish Super Lig'],['ksa.1','Saudi Pro League'],['jpn.1','Japanese J1'],['aus.1','Australian A-League']
+];
+async function espnFixtures(){
+ const day=worldDay().replace(/-/g,'');
+ const responses=await Promise.allSettled(ESPN_LEAGUES.map(async ([code,title])=>{
+  const u='https://site.api.espn.com/apis/site/v2/sports/soccer/'+encodeURIComponent(code)+'/scoreboard?dates='+day;
+  const res=await fetch(u,{cache:'no-store'});
+  if(!res.ok)throw Error('ESPN '+code+' HTTP '+res.status);
+  const j=await res.json();
+  return (j.events||[]).map(e=>{
+   const c=e.competitions?.[0],home=c?.competitors?.find(x=>x.homeAway==='home'),away=c?.competitors?.find(x=>x.homeAway==='away');
+   if(!home||!away)return null;
+   return {id:'espn-'+code+'-'+e.id,commence_time:e.date,home_team:home.team?.displayName||home.team?.name,away_team:away.team?.displayName||away.team?.name,_sport:code,_title:title};
+  }).filter(Boolean);
+ }));
+ const results=responses.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
+ if(!responses.some(x=>x.status==='fulfilled'))throw Error('ESPN fixture sources unreachable');
+ return {events:results,leagues:responses.filter(x=>x.status==='fulfilled').length,failed:responses.filter(x=>x.status==='rejected').length};
+}
+async function loadWorldwide(){
+ $('worldStatus').textContent='Fetching live football fixtures…';
+ const problems=[];let sources=[];
+ try{
+  const primary=await espnFixtures();
+  worldwideEvents=primary.events;sources.push('ESPN '+primary.leagues+' leagues');
+  if(primary.failed)problems.push(primary.failed+' ESPN leagues unavailable');
+ }catch(e){problems.push('ESPN: '+e.message);worldwideEvents=[]}
+ if(!worldwideEvents.length){
+  try{
+   const res=await fetch(WORLD_API+'/api/sports',{cache:'no-store'}),j=await res.json();
+   if(!res.ok||!j.success)throw Error(j.error||'Sports list unavailable');
+   const all=(j.competitions||[]).map(x=>x.key).filter(x=>String(x).startsWith('soccer_'));
+   const preferred=['soccer_brazil_campeonato','soccer_argentina_primera_division','soccer_epl','soccer_spain_la_liga','soccer_germany_bundesliga','soccer_italy_serie_a','soccer_france_ligue_one'];
+   const keys=[...preferred.filter(x=>all.includes(x)),...all.filter(x=>!preferred.includes(x))].slice(0,Math.min(10,j.maxCompetitionsPerRefresh||10));
+   if(!keys.length)throw Error('No active competitions');
+   const response=await fetch(WORLD_API+'/api/unified-odds?competitions='+encodeURIComponent(keys.join(',')),{cache:'no-store'});
+   const data=await response.json();
+   const events=(data.results||[]).flatMap(g=>(g.events||[]).map(e=>({...e,_sport:g.key,_title:g.competition})));
+   if(!events.length)throw Error((data.errors||[]).map(e=>e.competition+': '+e.error).join('; ')||data.error||'No fixtures available');
+   worldwideEvents=events;sources.push('Odds API '+keys.length+' leagues');
+  }catch(e){problems.push('Odds API: '+e.message)}
+ }
+ const unique=new Set();worldwideEvents=worldwideEvents.filter(e=>{const k=e.id||[e.commence_time,e.home_team,e.away_team].join('|');if(unique.has(k))return false;unique.add(k);return true});
+ renderWorldwide();
+ $('worldStatus').textContent+=' · Source: '+(sources.join(', ')||'none')+(problems.length?' · Feed notes: '+problems.join(' | '):'');
+}
+$('worldRefresh').onclick=loadWorldwide;
+loadWorldwide();
+setInterval(()=>{if(worldwideDay!==worldDay())loadWorldwide()},60000);
+</script></body></html>
