@@ -33,6 +33,7 @@ def main():
     with urllib.request.urlopen(req,timeout=45) as res: html=res.read().decode('utf-8','replace')
     soup=BeautifulSoup(html,'html.parser')
     official={}
+    by_pair={}
     unknown=[]
     for tr in soup.select('tr'):
         cells=[x.get_text(' ',strip=True) for x in tr.find_all(['td','th'],recursive=False)]
@@ -50,20 +51,31 @@ def main():
         score=(int(sm[1]),int(sm[2]))
         if key in official and official[key]!=score:raise RuntimeError(f'Conflicting official scores: {key}')
         official[key]=score
+        by_pair.setdefault((home,away),[]).append((key[0],score))
     if len(official)<300:
         raise RuntimeError(f'Official page parsed only {len(official)} fixtures; expected >=300. Refusing incomplete recovery.')
-    matched=[];remaining=[]
+    matched=[];remaining=[];date_mismatches=[]
     for r in queue:
         key=(r['date'],r['home'],r['away'])
         score=official.get(key)
-        if score is None:remaining.append(r)
+        if score is None:
+            remaining.append(r)
+            candidates=by_pair.get((r['home'],r['away']),[])
+            if len(candidates)==1:
+                official_date,official_score=candidates[0]
+                date_mismatches.append({'source_date':r['date'],'official_date':official_date,
+                    'league':'JAP','home':r['home'],'away':r['away'],
+                    'home_goals':official_score[0],'away_goals':official_score[1],
+                    'source_url':URL,'status':'date_mismatch_review'})
         else:matched.append({'date':r['date'],'league':'JAP','home':r['home'],'away':r['away'],
                             'home_goals':score[0],'away_goals':score[1],'source_url':URL})
     save('recovered_official.csv',matched,['date','league','home','away','home_goals','away_goals','source_url'])
     save('still_unmatched.csv',remaining,list(queue[0]) if queue else ['date','league','home','away'])
+    save('date_mismatch_review.csv',date_mismatches,['source_date','official_date','league','home','away','home_goals','away_goals','source_url','status'])
     save('unparsed_official_rows.csv',unknown,['date','home','score','away'])
     summary={'official_fixtures_parsed':len(official),'queued':len(queue),
              'recovered':len(matched),'remaining':len(remaining),
+             'date_mismatch_candidates':len(date_mismatches),
              'unparsed_official_rows':len(unknown),'source':URL,
              'status':'review_only_no_master_merge'}
     (OUT/'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
