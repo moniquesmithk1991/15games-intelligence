@@ -1,0 +1,26 @@
+name: 15GAMES Argentina 2025 and Brazil 2026 staging audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit next leagues against V2
+        run: python scripts/audit_next_leagues.py
+      - name: Upload review package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 15games-argentina-brazil-next-leagues-review
+          path: data/next_leagues_review/
+          if-no-files-found: warn
