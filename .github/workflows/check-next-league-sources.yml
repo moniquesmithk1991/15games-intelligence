@@ -1,0 +1,26 @@
+name: 15GAMES check Argentina and Brazil upstream coverage
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect source score coverage
+        run: python scripts/check_next_league_sources.py
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 15games-next-leagues-source-coverage
+          path: data/source_coverage_review/source_coverage.json
+          if-no-files-found: warn
