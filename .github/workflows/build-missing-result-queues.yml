@@ -1,0 +1,26 @@
+name: 15GAMES generate missing fixture verification queues
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  queues:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate missing-score queues
+        run: python scripts/build_missing_result_queues.py
+      - name: Upload queues
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 15games-missing-results-queues
+          path: data/missing_results_review/
+          if-no-files-found: warn
