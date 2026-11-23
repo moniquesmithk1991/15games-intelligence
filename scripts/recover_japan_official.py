@@ -81,4 +81,43 @@ def main():
     (OUT/'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(summary,indent=2))
     if len(queue)!=140:raise RuntimeError(f'Expected 140 queued rows; got {len(queue)}')
+    if len(official)!=380:raise RuntimeError(f'Expected 380 official fixtures; got {len(official)}')
+    if len(matched)!=119 or len(date_mismatches)!=21:
+        raise RuntimeError('Unexpected reconciliation counts; stop for manual review')
+    # Compare all 380 official fixtures to the previously staged 127 + 113.
+    staged_files=[
+        ROOT/'data/staging/japan_j1_2025_source_ft.csv',
+        ROOT/'data/staging/japan_j1_2025_recovered_113_ft.csv'
+    ]
+    staged={}
+    for p in staged_files:
+        with p.open(encoding='utf-8-sig',newline='') as f:
+            for row in csv.DictReader(f):
+                pair=(row['home'],row['away'])
+                if pair in staged:raise RuntimeError(f'Duplicate staged fixture: {pair}')
+                staged[pair]=row
+    if len(staged)!=240:raise RuntimeError(f'Expected 240 staged results; got {len(staged)}')
+    official_pairs={}
+    for (date,home,away),sc in official.items():
+        pair=(home,away)
+        if pair in official_pairs:raise RuntimeError(f'Duplicate official fixture pair: {pair}')
+        official_pairs[pair]=(date,sc)
+    if len(official_pairs)!=380:raise RuntimeError('Official fixture pairs not unique')
+    conflicts=[]
+    for pair,row in staged.items():
+        entry=official_pairs.get(pair)
+        if entry is None:
+            conflicts.append({'home':pair[0],'away':pair[1],'issue':'not_in_official'})
+        elif (int(row['home_goals']),int(row['away_goals']))!=entry[1]:
+            conflicts.append({'home':pair[0],'away':pair[1],'issue':'score_conflict'})
+    save('existing_staged_conflicts.csv',conflicts,['home','away','issue'])
+    if conflicts:
+        raise RuntimeError(f'{len(conflicts)} staged score/pair conflicts: review before assembly')
+    complete=[]
+    for (date,home,away),sc in sorted(official.items()):
+        complete.append({'date':date,'league':'JAP','home':home,'away':away,
+                         'home_goals':sc[0],'away_goals':sc[1],'source_url':URL})
+    save('japan_j1_2025_complete_380_review.csv',complete,
+         ['date','league','home','away','home_goals','away_goals','source_url'])
+    print('Complete official 380-match review file assembled; master unchanged.')
 if __name__=='__main__':main()
