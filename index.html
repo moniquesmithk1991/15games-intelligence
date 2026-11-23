@@ -133,7 +133,7 @@ csvRetrieve().then(x=>x?csvInstall(x):$('csvStatus').textContent='No saved CSV y
 function renderWorldwide(){
  const target=worldDay();worldwideDay=target;let shown=0,covered=0,rows=[];
  const events=worldwideEvents.filter(e=>e.commence_time&&worldDate(e.commence_time)===target).sort((a,b)=>a.commence_time.localeCompare(b.commence_time));
- const top5=x=>x.scores.slice(0,5).map(y=>fmt(y)+' ('+pct(y.p)+')').join(' · ');
+ const top15=x=>{const best=x.scores.slice(0,15),coverage=best.reduce((sum,y)=>sum+y.p,0);return '<div class="muted" style="margin-top:6px">Top 15 combined probability: '+pct(coverage)+'</div><ol style="margin:6px 0;padding-left:23px">'+best.map(y=>'<li>'+fmt(y)+' — '+pct(y.p)+'</li>').join('')+'</ol>'};
  for(const event of events){
   shown++;const league=worldLeague(event.sport_key||event._sport),home=event.home_team,away=event.away_team;
   let v3=null,v5=null,source='Not enough matching V3/V5 history';
@@ -157,7 +157,7 @@ function renderWorldwide(){
    }
   }
   const available=!!(v3&&v5);if(available)covered++;
-  const cell=model=>model?'<strong>'+fmt(model.scores[0])+' ('+pct(model.scores[0].p)+')</strong><div class="muted" style="max-width:360px">'+top5(model)+'</div>':'<span class="muted">Unavailable</span>';
+  const cell=model=>model?'<strong>'+fmt(model.scores[0])+' ('+pct(model.scores[0].p)+')</strong><div class="muted" style="max-width:360px">'+top15(model)+'</div>':'<span class="muted">Unavailable</span>';
   const csv=csvLoaded?csvForecast(event):null;
   const csvText=csv?'<div class="muted" style="margin-top:7px">CSV alternatives — V4: '+csv.v4[0].i+'-'+csv.v4[0].j+'; DC-style V5: '+csv.v5[0].i+'-'+csv.v5[0].j+'; V6: '+csv.v6[0].i+'-'+csv.v6[0].j+'</div>':'';
   rows.push('<tr><td>'+escapeHtml(event.commence_time.slice(0,16))+'</td><td>'+escapeHtml(event.sport_title||event._title||event.sport_key||'Soccer')+'</td><td>'+escapeHtml(home)+' vs '+escapeHtml(away)+csvText+'</td><td>'+cell(v3)+'</td><td>'+cell(v5)+'</td><td>'+escapeHtml(source)+'</td></tr>');
