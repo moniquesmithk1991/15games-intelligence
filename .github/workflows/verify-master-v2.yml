@@ -1,0 +1,53 @@
+name: 15GAMES master V2 integrity check
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - historical_matches_v2_239614.csv
+      - .github/workflows/verify-master-v2.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify published historical data
+        run: |
+          python - <<'PY'
+          import csv,hashlib,json
+          from collections import Counter
+          from pathlib import Path
+          old=Path('historical_matches.csv')
+          new=Path('historical_matches_v2_239614.csv')
+          expected_old='6362ddff48c453989d2416b8c16a4889641f1db4a4ae27d441203c5570fef55d'
+          expected_new='0f7727a945fcab2707af8be25a72431ae213b2f7951587f1661f4f32cd1aafd4'
+          if hashlib.sha256(old.read_bytes()).hexdigest()!=expected_old:raise RuntimeError('Original master changed')
+          if hashlib.sha256(new.read_bytes()).hexdigest()!=expected_new:raise RuntimeError('V2 checksum mismatch')
+          with new.open(encoding='utf-8-sig',newline='') as f:
+              rd=csv.DictReader(f)
+              required={'date','league','home','away','home_goals','away_goals'}
+              if not required.issubset(rd.fieldnames or []):raise RuntimeError('Missing required columns')
+              rows=0;seen=set();years=Counter()
+              for r in rd:
+                  rows+=1
+                  k=(r['date'].strip(),r['league'].strip().upper(),r['home'].strip().casefold(),r['away'].strip().casefold())
+                  if k in seen:raise RuntimeError(f'Duplicate fixture key: {k}')
+                  seen.add(k)
+                  for c in ('home_goals','away_goals'):
+                      if not r[c].isdigit() or not 0<=int(r[c])<=30:raise RuntimeError(f'Invalid {c} in {k}')
+                  years[(r['league'],r['date'][:4])]+=1
+          if rows!=239614:raise RuntimeError(f'Expected 239614, got {rows}')
+          for league in ('BRA','JAP'):
+              if years[(league,'2025')]!=380:raise RuntimeError(f'Unexpected {league} 2025 count')
+          Path('v2_integrity_report.json').write_text(json.dumps({'rows':rows,'sha256':expected_new,'unique_fixture_keys':len(seen),'brazil_2025':years[('BRA','2025')],'japan_2025':years[('JAP','2025')],'status':'passed'},indent=2)+'\n')
+          print('Published master V2 integrity passed')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 15games-master-v2-integrity
+          path: v2_integrity_report.json
