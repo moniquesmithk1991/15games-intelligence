@@ -1,0 +1,33 @@
+name: 15GAMES alias reconciliation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/audit_aliases.py'
+      - '.github/workflows/historical-alias-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compare staged and master data
+        run: |
+          python scripts/audit_staging.py
+          python scripts/audit_aliases.py
+      - name: Upload both audits
+        uses: actions/upload-artifact@v4
+        with:
+          name: 15games-alias-review
+          path: |
+            data/audit/
+            data/alias_audit/
+          retention-days: 30
