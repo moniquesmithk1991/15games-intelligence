@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-22T18:56:34.302253+00:00",
+  "updated_at": "2026-11-23T01:22:20.766926+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -104756,9 +104756,9 @@
       "date": "2026-11-22T19:00Z",
       "home": "Athletico-PR",
       "away": "Remo",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 4,
+      "away_goals": 2,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261122&limit=100"
     },
@@ -104768,9 +104768,9 @@
       "date": "2026-11-22T19:00Z",
       "home": "Rosario Central",
       "away": "Gimnasia (Mendoza)",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 3,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261122&limit=100"
     },
@@ -104780,9 +104780,9 @@
       "date": "2026-11-22T19:00Z",
       "home": "Criciúma",
       "away": "Fortaleza",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 1,
+      "away_goals": 0,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.2/scoreboard?dates=20261122&limit=100"
     },
@@ -104792,9 +104792,9 @@
       "date": "2026-11-22T21:30Z",
       "home": "Fluminense",
       "away": "Mirassol",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 1,
+      "away_goals": 0,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261122&limit=100"
     },
@@ -104804,9 +104804,9 @@
       "date": "2026-11-22T21:30Z",
       "home": "Atlético Goianiense",
       "away": "Vila Nova",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 1,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.2/scoreboard?dates=20261122&limit=100"
     },
@@ -104816,9 +104816,9 @@
       "date": "2026-11-22T22:00Z",
       "home": "River Plate",
       "away": "Lanús",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 3,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261122&limit=100"
     },
@@ -104828,9 +104828,9 @@
       "date": "2026-11-22T22:30Z",
       "home": "Red Bull Bragantino",
       "away": "Vasco da Gama",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 1,
+      "away_goals": 0,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261122&limit=100"
     },
@@ -104842,7 +104842,7 @@
       "away": "Tristán Suárez",
       "home_goals": null,
       "away_goals": null,
-      "status": "pre",
+      "status": "in",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261122&limit=100"
     },
@@ -104854,7 +104854,7 @@
       "away": "Huracán",
       "home_goals": null,
       "away_goals": null,
-      "status": "pre",
+      "status": "in",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261122&limit=100"
     },
@@ -105085,6 +105085,18 @@
       "status": "pre",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261129&limit=100"
+    },
+    {
+      "id": "401936353",
+      "league": "ARG1",
+      "date": "2026-11-29T20:00Z",
+      "home": "Vélez Sarsfield",
+      "away": "Independiente",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261129&limit=100"
     },
     {
       "id": "401841334",
