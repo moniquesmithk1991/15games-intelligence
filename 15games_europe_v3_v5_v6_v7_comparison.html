@@ -23,13 +23,13 @@ const hleagues=new Set(hh.map(x=>x.league).filter(Boolean)),aleagues=new Set(aa.
 let hs=common.length?hh.filter(x=>common.includes(x.league)):hh,as=common.length?aa.filter(x=>common.includes(x.league)):aa;
 if(hs.length<5||as.length<5){hs=hh;as=aa}
 const clamp=x=>Math.max(.15,Math.min(5,x));
-const lh=clamp((avg(hs,'hg')+avg(as,'hg'))/2),la=clamp((avg(as,'ag')+avg(hs,'ag'))/2);
+const lh=clamp((avg(hs,'hg')+avg(as,'ag'))/2),la=clamp((avg(as,'ag')+avg(hs,'ag'))/2);
 const v3=dist(lh,la);
-const sample=[...hs.map(x=>({s:x.hg+'-'+x.ag})),...as.map(x=>({s:x.hg+'-'+x.ag}))];
+const sample=[...hs.map(x=>({s:x.hg+'-'+x.ag})),...as.map(x=>({s:x.ag+'-'+x.hg}))];
 const counts=new Map();for(const z of sample)counts.set(z.s,(counts.get(z.s)||0)+1);
 const v5=v3.map(z=>({s:z.s,p:((counts.get(z.s)||0)+12*z.p)/(sample.length+12)}));
 const weighted=(arr,k)=>{let num=0,den=0;for(const x of arr){const w=Math.exp(-.75*(2026-x.year));num+=x[k]*w;den+=w}return den?num/den:avg(arr,k)};
-const v6=dist(clamp((weighted(hs,'hg')+weighted(as,'hg'))/2),clamp((weighted(as,'ag')+weighted(hs,'ag'))/2));
+const v6=dist(clamp((weighted(hs,'hg')+weighted(as,'ag'))/2),clamp((weighted(as,'ag')+weighted(hs,'ag'))/2));
 const v7=v3.map((z,j)=>({s:z.s,p:.35*z.p+.3*v5[j].p+.35*v6[j].p}));
 const picks=[top(v3).s,top(v5).s,top(v6).s,top(v7).s],unique=new Set(picks);
 ready++;
@@ -37,7 +37,7 @@ return '<tr><td>'+(i+1)+'</td><td>'+escapeHtml(h)+' – '+escapeHtml(a)+'</td><t
 }).join('');
 status.textContent=ready+' of 39 candidate fixtures have enough history for all four experimental variants; '+(39-ready)+' insufficient. Not a backtest; no accuracy claims.';
 }
-function parse(t){const rows=csvRows(t);const h=rows.shift().map(x=>clean(x));const field=(...names)=>names.map(n=>h.indexOf(clean(n))).find(n=>n>=0);const hi=field('home','hometeam'),ai=field('away','awayteam'),gi=field('home_goals','fthg','homegoals'),ji=field('away_goals','ftag','awaygoals'),di=field('date');if([hi,ai,gi,ji].some(x=>x===undefined))throw Error('Missing required CSV columns. Found: '+h.join(', '));const li=field('league','competition','div','division');const out=[];for(const r of rows){let year=null;if(di!==undefined){const d=(r[di]||'').trim();const y=d.match(/^(\d{4})[-\/]/)||d.match(/^\d{1,2}[-\/]\d{1,2}[-\/](\d{4})/);if(y)year=Number(y[1]);if(year&&year>2026)continue;if(year===2026&&/^2026[-\/]11[-\/](2[3-9]|30)/.test(d))continue;}const hg=Number(r[gi]),ag=Number(r[ji]);if(!Number.isInteger(hg)||!Number.isInteger(ag)||hg<0||ag<0||hg>25||ag>25)continue;out.push({h:normalize(r[hi]),a:normalize(r[ai]),hg,ag,league:li===undefined?'':clean(r[li]),year})}return out}
+function parse(t){const rows=csvRows(t);const h=rows.shift().map(x=>clean(x));const field=(...names)=>names.map(n=>h.indexOf(clean(n))).find(n=>n>=0);const hi=field('home','hometeam'),ai=field('away','awayteam'),gi=field('home_goals','fthg','homegoals'),ji=field('away_goals','ftag','awaygoals'),di=field('date');if([hi,ai,gi,ji,di].some(x=>x===undefined))throw Error('Missing required CSV columns. Found: '+h.join(', '));const li=field('league','competition','div','division');const out=[];for(const r of rows){let year=null;if(di!==undefined){const d=(r[di]||'').trim();const y=d.match(/^(\d{4})[-\/]/)||d.match(/^\d{1,2}[-\/]\d{1,2}[-\/](\d{4})/);if(y)year=Number(y[1]);if(year&&year>2026)continue;if(year===2026&&/^2026[-\/]11[-\/](2[3-9]|30)/.test(d))continue;}const hg=Number(r[gi]),ag=Number(r[ji]);if(!Number.isInteger(hg)||!Number.isInteger(ag)||hg<0||ag<0||hg>25||ag>25)continue;out.push({h:normalize(r[hi]),a:normalize(r[ai]),hg,ag,league:li===undefined?'':clean(r[li]),year})}return out}
 
 const sources={
 '2023-24':['en.1','en.2','es.1','fr.1','it.1','nl.1','de.1','de.2','pt.1','at.1'],
