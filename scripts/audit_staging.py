@@ -73,7 +73,7 @@ def save_csv(name, rows, columns):
 
 def main():
     if not MASTER.is_file(): raise SystemExit(f"Missing master: {MASTER}")
-    paths = sorted(STAGING.glob("*.csv"))
+    paths = sorted(p for p in STAGING.glob("*.csv") if not p.name.endswith("_review.csv"))
     if not paths: raise SystemExit("No staging CSV files found")
     master = {}
     master_invalid = 0
