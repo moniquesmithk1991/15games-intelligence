@@ -90,11 +90,23 @@ function renderWorldwide(){
   let output='<td colspan="4">No compatible league/team history for V3/V5</td>';
   if(league){
    const history=matches.filter(x=>x.league===league&&valid(x)&&date(x)<event.commence_time);
-   const h=history.find(x=>normalizeTeam(x.home)===normalizeTeam(home)||normalizeTeam(x.away)===normalizeTeam(home));
-   const a=history.find(x=>normalizeTeam(x.home)===normalizeTeam(away)||normalizeTeam(x.away)===normalizeTeam(away));
+   // Match ESPN names to the actual historical team identifiers, not merely
+   // display names: historical records use home_team_id / away_team_id.
+   const aliases={'gimnasialaplata':'gimnasia','newellsoldboys':'newells','atleticomineiro':'atleticomg','vitoria':'vitoria','saopaulo':'saopaulo'};
+   function resolve(name){
+    const wanted=normalizeTeam(name),canonical=aliases[wanted]||wanted;
+    for(const x of history){
+     for(const side of ['home','away']){
+      const n=normalizeTeam(x[side]);
+      if(n===wanted||n===canonical||(aliases[n]||n)===canonical)
+       return {name:x[side],id:key(x,side)};
+     }
+    }
+    return null;
+   }
+   const h=resolve(home),a=resolve(away);
    if(h&&a){
-    const getName=(name)=>{const x=history.find(y=>normalizeTeam(y.home)===normalizeTeam(name)||normalizeTeam(y.away)===normalizeTeam(name));return x?(normalizeTeam(x.home)===normalizeTeam(name)?x.home:x.away):name};
-    const m={date:event.commence_time,league,home:getName(home),away:getName(away),status:'pre'};
+    const m={date:event.commence_time,league,home:h.name,away:a.name,home_team_id:h.id,away_team_id:a.id,status:'pre'};
     const st=stats(history,m.date,'v3'),min=+$('minimum').value,v3=predict(m,st,min,'v3'),v5=predictV5(m,history,st,min);
     if(v3&&v5){covered++;output='<td>'+v5.xh.toFixed(2)+' / '+v5.xa.toFixed(2)+'</td><td>'+v5.scores.slice(0,5).map(x=>fmt(x)+' ('+pct(x.p)+')').join(', ')+'<div>V3: '+fmt(v3.scores[0])+'</div></td><td>'+[v5.p1,v5.px,v5.p2].map(pct).join(' / ')+'</td><td>'+pct(v5.scoreConfidence)+'</td>';}
    }
