@@ -72,7 +72,7 @@ $('reconcile').onclick=async()=>{const button=$('reconcile');button.disabled=tru
 $('exportLedger').onclick=()=>{const cols=['saved','date','league','home','away','v3','v3p','v5','v5p','actual'];const csv=[cols.join(','),...ledgerRead().map(x=>cols.map(k=>'"'+String(x[k]??'').replace(/"/g,'""')+'"').join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='15games_prospective_ledger.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 renderLedger();
 
-async function load(){try{const r=await fetch('./data/south_america_matches.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();let extra=[];try{const x=await fetch('./data/south_america_additional_matches.json?t='+Date.now(),{cache:'no-store'});if(x.ok){const v=await x.json();extra=v.matches||[]}}catch(e){console.warn('Additional historical feed unavailable',e)}matches=[...(j.matches||[]),...extra,...importedMatches];refreshLeagues();const years={};for(const m of matches){const y=date(m).slice(0,4);years[y]=(years[y]||0)+1}$('feed').textContent='Published '+j.updated_at+' · '+matches.length+' fixtures · years: '+Object.entries(years).sort().map(([y,n])=>y+' ('+n+')').join(', ')+' · '+(j.errors?.length||0)+' collection errors.';evaluate()}catch(e){$('status').textContent='Unable to load or evaluate data: '+e.message;console.error(e)}}
+async function load(){try{const r=await fetch('./data/south_america_matches.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();let extra=[];try{const x=await fetch('./data/south_america_additional_matches.json?t='+Date.now(),{cache:'no-store'});if(x.ok){const v=await x.json();extra=v.matches||[]}}catch(e){console.warn('Additional historical feed unavailable',e)}matches=[...(j.matches||[]),...extra,...importedMatches];refreshLeagues();if(uploadedFixtures.length)renderUploadedFixtures();const years={};for(const m of matches){const y=date(m).slice(0,4);years[y]=(years[y]||0)+1}$('feed').textContent='Published '+j.updated_at+' · '+matches.length+' fixtures · years: '+Object.entries(years).sort().map(([y,n])=>y+' ('+n+')').join(', ')+' · '+(j.errors?.length||0)+' collection errors.';evaluate()}catch(e){$('status').textContent='Unable to load or evaluate data: '+e.message;console.error(e)}}
 $('importLeague').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const parsed=JSON.parse(await file.text());const rows=Array.isArray(parsed)?parsed:parsed.matches;if(!Array.isArray(rows))throw Error('Expected an array or an object containing matches[]');const allowed=new Set(['COL1','CHI1','URU1','PAR1','PER1','ECU1','BOL1','VEN1']);const clean=rows.filter(m=>allowed.has(m.league)&&m.home&&m.away&&Number.isFinite(Date.parse(m.date))&&((m.status==='post'&&Number.isInteger(m.home_goals)&&Number.isInteger(m.away_goals))||m.status==='pre'));if(!clean.length)throw Error('No valid additional-league matches found. Required: league, date (ISO UTC), home, away, status pre/post, and final goals for post');importedMatches=clean;const r=await fetch('./data/south_america_matches.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('Base feed HTTP '+r.status);const j=await r.json();matches=[...(j.matches||[]),...importedMatches];refreshLeagues();$('importStatus').textContent='Imported '+clean.length+' fixtures across '+new Set(clean.map(m=>m.league)).size+' new leagues for this page session. Not saved to GitHub or browser storage.';evaluate()}catch(err){$('importStatus').textContent='Import failed: '+err.message}};$('clearImported').onclick=async()=>{importedMatches=[];$('importLeague').value='';await load();$('importStatus').textContent='Imported league data cleared.'};
 $('run').onclick=()=>{try{evaluate()}catch(e){$('status').textContent='Evaluation failed: '+e.message;console.error(e)}};$('league').onchange=$('run').onclick;$('minimum').onchange=$('run').onclick;load();
 
@@ -126,19 +126,27 @@ function csvForecast(event){
  scores.forEach(x=>x.p/=sum);scores.sort((a,b)=>b.p-a.p);return scores}
  return {league,h:hn,a:an,xh,xa,v4:model('V4'),v5:model('V5'),v6:model('V6'),homeN:home.length,awayN:away.length};
 }
-async function csvInstall(raw){$('csvStatus').textContent='Reading historical matches…';const parsed=csvParse(raw);csvByLeague=parsed.by;csvLoaded=true;$('csvStatus').textContent=parsed.count.toLocaleString()+' matches · '+parsed.by.size+' competitions · latest '+parsed.latest+' · saved on this device';renderWorldwide();return parsed}
+async function csvInstall(raw){$('csvStatus').textContent='Reading historical matches…';const parsed=csvParse(raw);csvByLeague=parsed.by;csvLoaded=true;$('csvStatus').textContent=parsed.count.toLocaleString()+' matches · '+parsed.by.size+' competitions · latest '+parsed.latest+' · saved on this device';renderWorldwide();if(uploadedFixtures.length)renderUploadedFixtures();return parsed}
 $('worldCsv').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const raw=await f.text();await csvInstall(raw);await csvStore(raw);$('csvStatus').textContent+=' · stored for future visits'}catch(err){$('csvStatus').textContent='CSV import failed: '+err.message}});
 $('clearWorldCsv').onclick=async()=>{try{await csvStore(null);csvByLeague=new Map();csvLoaded=false;$('csvStatus').textContent='Saved CSV removed';renderWorldwide()}catch(e){$('csvStatus').textContent=e.message}};
 csvRetrieve().then(x=>x?csvInstall(x):$('csvStatus').textContent='No saved CSV yet — choose historical_matches.csv once').catch(e=>$('csvStatus').textContent='Browser storage unavailable: '+e.message);
 
 let uploadedFixtures=[];
+function correctFixtureMetadata(f){
+ const pair=[normalizeTeam(f.home),normalizeTeam(f.away)].join('|');
+ const fixes={
+ 'basaksehirfk|corumfk':['Türkiye','1. Lig'],
+ 'bodrumfk|vansporfk':['Türkiye','1. Lig']
+ };
+ const corrected=fixes[pair];return corrected?{...f,country:corrected[0],league:corrected[1],originalCountry:f.country,originalLeague:f.league}:f;
+}
 const fixtureLeague=(f)=>{
  const c=normalizeTeam(f.country),l=normalizeTeam(f.league);
  const maps=[
  ['brazil','campeonatobrasileiroseriea','BRA1'],['brazil','campeonatobrasileiroserieb','BRA2'],
  ['argentina','ligaprofesionaldefutbol','ARG1'],['argentina','primeradivision','ARG1'],
  ['colombia','primeradivision','COL1'],['colombia','categoriaprimeraa','COL1'],
- ['chile','primeradivision','CHI1'],['uruguay','primeradivision','URU1'],
+ ['chile','primeradivision','CHI1'],['uruguay','primeradivision','URU1'],['uruguay','ligaaufuruguaya','URU1'],
  ['paraguay','primeradivision','PAR1'],['peru','primeradivision','PER1'],
  ['ecuador','seriea','ECU1'],['bolivia','divisionprofesional','BOL1'],
  ['venezuela','primeradivision','VEN1']
@@ -148,7 +156,7 @@ const fixtureLeague=(f)=>{
 };
 const fixtureCSVLeague=(f)=>{
  const c=normalizeTeam(f.country),l=normalizeTeam(f.league);
- const m={'england:premierleague':'E0','spain:laliga':'SP1','spain:laliga2':'SP2','italy:seriea':'I1','italy:serieb':'I2','france:ligue1':'F1','france:ligue2':'F2','germany:bundesliga':'D1','germany:2bundesliga':'D2','netherlands:eredivisie':'N1','brazil:campeonatobrasileiroseriea':'BRA','argentina:ligaprofesionaldefutbol':'ARG','paraguay:primeradivisionclausura':'PAR','turkiye:trendyolsuperlig':'T1','turkey:trendyolsuperlig':'T1','sweden:allsvenskan':'SWE','denmark:danishsuperliga':'DEN','poland:ekstraklasa':'POL','romania:superligaromaniei':'ROM','japan:jleague':'JAP','usa:mls':'USA'};
+ const m={'england:premierleague':'E0','spain:laliga':'SP1','spain:laliga2':'SP2','spain:laliga':'SP1','italy:seriea':'I1','italy:serieb':'I2','france:ligue1':'F1','france:ligue2':'F2','germany:bundesliga':'D1','germany:2bundesliga':'D2','netherlands:eredivisie':'N1','brazil:campeonatobrasileiroseriea':'BRA','argentina:ligaprofesionaldefutbol':'ARG','paraguay:primeradivisionclausura':'PAR','turkiye:trendyolsuperlig':'T1','turkey:trendyolsuperlig':'T1','sweden:allsvenskan':'SWE','denmark:danishsuperliga':'DEN','poland:ekstraklasa':'POL','romania:superligaromaniei':'ROM','japan:jleague':'JAP','usa:mls':'USA'};
  return m[c+':'+l]||null;
 };
 function parseFixtureCSV(text){
@@ -157,15 +165,19 @@ function parseFixtureCSV(text){
  const get=(a,k)=>idx[k]===undefined?'':(a[idx[k]]||'').trim(),out=[],seen=new Set();
  for(const line of lines){const a=csvParseLine(line),f={date:get(a,'date'),time:get(a,'kickoff_time_as_shown')||get(a,'time'),country:get(a,'country'),league:get(a,'league'),home:get(a,'home'),away:get(a,'away')};
  if(!/^\d{4}-\d{2}-\d{2}$/.test(f.date)||!f.home||!f.away)continue;
- const id=[f.date,f.country,f.league,f.home,f.away].map(normalizeTeam).join('|');if(seen.has(id))continue;seen.add(id);out.push(f)}
+ const id=[f.date,f.country,f.league,f.home,f.away].map(normalizeTeam).join('|');if(seen.has(id))continue;seen.add(id);out.push(correctFixtureMetadata(f))}
  return out;
 }
-function renderUploadedFixtures(){
+let fixtureRenderToken=0;
+async function renderUploadedFixtures(){
+ const token=++fixtureRenderToken;
  const el=$('fixtureRows');if(!el)return;
  let eligible=0;const min=+$('minimum').value;
  const top=x=>{const arr=x.scores.slice(0,15),sum=arr.reduce((v,y)=>v+y.p,0);return '<strong>Top 15 coverage: '+pct(sum)+'</strong><ol style="padding-left:24px;margin:6px 0">'+arr.map(y=>'<li>'+fmt(y)+' — '+pct(y.p)+'</li>').join('')+'</ol>'};
  const output=[];
  for(const f of uploadedFixtures){
+  if(token!==fixtureRenderToken)return;
+  if(output.length&&output.length%5===0){$('fixtureStatus').textContent='Calculating V3/V5: '+output.length+' / '+uploadedFixtures.length+' fixtures…';await new Promise(resolve=>setTimeout(resolve,0));if(token!==fixtureRenderToken)return}
   const lg=fixtureLeague(f),cl=fixtureCSVLeague(f);
   let hist=[],label='',home=f.home,away=f.away;
   if(lg){
@@ -198,7 +210,7 @@ async function handleFixtureUpload(file){
   status.textContent='Imported '+parsed.length+' fixtures from '+file.name+'. Calculating V3/V5; please wait…';
   $('fixtureRows').innerHTML='<tr><td colspan="6">Processing '+parsed.length+' fixtures. Please wait…</td></tr>';
   await new Promise(resolve=>setTimeout(resolve,40));
-  renderUploadedFixtures();
+  await renderUploadedFixtures();
  }catch(err){status.textContent='Upload error: '+(err?.message||String(err));console.error('Fixture upload error',err)}
 }
 $('fixtureUpload').addEventListener('change',e=>handleFixtureUpload(e.currentTarget.files?.[0]));
