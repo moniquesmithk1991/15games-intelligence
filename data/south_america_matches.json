@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-24T13:25:49.318039+00:00",
+  "updated_at": "2026-11-24T19:07:59.036521+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -104955,6 +104955,18 @@
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261126&limit=100"
     },
     {
+      "id": "401933218",
+      "league": "ARG2",
+      "date": "2026-11-27T22:00Z",
+      "home": "Atlanta",
+      "away": "Ciudad de Bolívar",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261127&limit=100"
+    },
+    {
       "id": "401841337",
       "league": "BRA1",
       "date": "2026-11-27T23:00Z",
@@ -105001,18 +105013,6 @@
       "status": "pre",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.2/scoreboard?dates=20261128&limit=100"
-    },
-    {
-      "id": "401933218",
-      "league": "ARG2",
-      "date": "2026-11-28T20:00Z",
-      "home": "Atlanta",
-      "away": "Ciudad de Bolívar",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
-      "source": "ESPN public scoreboard",
-      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261128&limit=100"
     },
     {
       "id": "401933217",
