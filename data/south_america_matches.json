@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-23T19:10:30.187074+00:00",
+  "updated_at": "2026-11-24T01:19:44.722713+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -104864,9 +104864,9 @@
       "date": "2026-11-23T20:00Z",
       "home": "Gimnasia La Plata",
       "away": "Newell's Old Boys",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 4,
+      "away_goals": 2,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261123&limit=100"
     },
@@ -104876,9 +104876,9 @@
       "date": "2026-11-23T22:30Z",
       "home": "Internacional",
       "away": "Vitória",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 2,
+      "away_goals": 5,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261123&limit=100"
     },
@@ -104888,9 +104888,9 @@
       "date": "2026-11-23T23:00Z",
       "home": "Botafogo",
       "away": "São Paulo",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 1,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261123&limit=100"
     },
@@ -104902,7 +104902,7 @@
       "away": "Grêmio",
       "home_goals": null,
       "away_goals": null,
-      "status": "pre",
+      "status": "in",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261123&limit=100"
     },
