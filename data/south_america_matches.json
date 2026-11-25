@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-25T01:25:58.503479+00:00",
+  "updated_at": "2026-11-25T07:30:55.729678+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -105003,6 +105003,18 @@
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261127&limit=100"
     },
     {
+      "id": "401933198",
+      "league": "ARG2",
+      "date": "2026-11-28T00:00Z",
+      "home": "Tristán Suárez",
+      "away": "Gimnasia y Tiro (Salta)",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261127&limit=100"
+    },
+    {
       "id": "401932611",
       "league": "BRA2",
       "date": "2026-11-28T20:00Z",
@@ -105017,21 +105029,9 @@
     {
       "id": "401933217",
       "league": "ARG2",
-      "date": "2026-11-28T20:00Z",
+      "date": "2026-11-28T23:00Z",
       "home": "Deportivo Madryn",
       "away": "Gimnasia y Esgrima (Jujuy)",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
-      "source": "ESPN public scoreboard",
-      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261128&limit=100"
-    },
-    {
-      "id": "401933198",
-      "league": "ARG2",
-      "date": "2026-11-28T20:00Z",
-      "home": "Tristán Suárez",
-      "away": "Gimnasia y Tiro (Salta)",
       "home_goals": null,
       "away_goals": null,
       "status": "pre",
