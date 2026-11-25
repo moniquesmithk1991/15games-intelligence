@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-25T13:30:39.818046+00:00",
+  "updated_at": "2026-11-25T19:00:45.789585+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -105092,6 +105092,30 @@
       "date": "2026-11-29T20:00Z",
       "home": "Vélez Sarsfield",
       "away": "Independiente",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261129&limit=100"
+    },
+    {
+      "id": "401936413",
+      "league": "ARG1",
+      "date": "2026-11-29T20:00Z",
+      "home": "Instituto (Córdoba)",
+      "away": "River Plate",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261129&limit=100"
+    },
+    {
+      "id": "401936373",
+      "league": "ARG1",
+      "date": "2026-11-29T20:00Z",
+      "home": "Rosario Central",
+      "away": "Barracas Central",
       "home_goals": null,
       "away_goals": null,
       "status": "pre",
