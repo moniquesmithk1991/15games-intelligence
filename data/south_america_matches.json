@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-26T13:29:37.561220+00:00",
+  "updated_at": "2026-11-26T19:07:46.287714+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -105169,6 +105169,18 @@
       "status": "pre",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261129&limit=100"
+    },
+    {
+      "id": "401936657",
+      "league": "ARG1",
+      "date": "2026-11-29T23:30Z",
+      "home": "Boca Juniors",
+      "away": "Gimnasia La Plata",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261129&limit=100"
     },
     {
       "id": "401841338",
