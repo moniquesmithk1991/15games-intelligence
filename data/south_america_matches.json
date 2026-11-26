@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-25T19:00:45.789585+00:00",
+  "updated_at": "2026-11-26T01:25:48.797859+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -104924,9 +104924,9 @@
       "date": "2026-11-25T23:00Z",
       "home": "Atlético-MG",
       "away": "Corinthians",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 1,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261125&limit=100"
     },
@@ -104938,7 +104938,7 @@
       "away": "Independiente Rivadavia",
       "home_goals": null,
       "away_goals": null,
-      "status": "pre",
+      "status": "in",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261125&limit=100"
     },
