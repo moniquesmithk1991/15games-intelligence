@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-26T01:25:48.797859+00:00",
+  "updated_at": "2026-11-26T07:30:36.899319+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -104936,9 +104936,9 @@
       "date": "2026-11-26T00:00Z",
       "home": "Boca Juniors",
       "away": "Independiente Rivadavia",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "in",
+      "home_goals": 2,
+      "away_goals": 0,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261125&limit=100"
     },
