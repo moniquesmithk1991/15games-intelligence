@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-26T07:30:36.899319+00:00",
+  "updated_at": "2026-11-26T13:29:37.561220+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -105051,6 +105051,18 @@
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.2/scoreboard?dates=20261128&limit=100"
     },
     {
+      "id": "401936353",
+      "league": "ARG1",
+      "date": "2026-11-28T23:00Z",
+      "home": "Vélez Sarsfield",
+      "away": "Independiente",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261128&limit=100"
+    },
+    {
       "id": "401841336",
       "league": "BRA1",
       "date": "2026-11-29T00:00Z",
@@ -105061,6 +105073,18 @@
       "status": "pre",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261128&limit=100"
+    },
+    {
+      "id": "401936413",
+      "league": "ARG1",
+      "date": "2026-11-29T01:00Z",
+      "home": "Instituto (Córdoba)",
+      "away": "River Plate",
+      "home_goals": null,
+      "away_goals": null,
+      "status": "pre",
+      "source": "ESPN public scoreboard",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261128&limit=100"
     },
     {
       "id": "401841333",
@@ -105085,30 +105109,6 @@
       "status": "pre",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261129&limit=100"
-    },
-    {
-      "id": "401936353",
-      "league": "ARG1",
-      "date": "2026-11-29T20:00Z",
-      "home": "Vélez Sarsfield",
-      "away": "Independiente",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
-      "source": "ESPN public scoreboard",
-      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261129&limit=100"
-    },
-    {
-      "id": "401936413",
-      "league": "ARG1",
-      "date": "2026-11-29T20:00Z",
-      "home": "Instituto (Córdoba)",
-      "away": "River Plate",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
-      "source": "ESPN public scoreboard",
-      "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=20261129&limit=100"
     },
     {
       "id": "401936373",
