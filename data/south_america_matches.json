@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-26T19:07:46.287714+00:00",
+  "updated_at": "2026-11-27T01:28:20.959627+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -104948,9 +104948,9 @@
       "date": "2026-11-26T23:00Z",
       "home": "São Paulo",
       "away": "Remo",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "pre",
+      "home_goals": 3,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261126&limit=100"
     },
