@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-28T01:24:27.862931+00:00",
+  "updated_at": "2026-11-28T07:24:08.591667+00:00",
   "source_type": "third-party ESPN, not official AFA/CBF",
   "matches": [
     {
@@ -104996,9 +104996,9 @@
       "date": "2026-11-28T00:00Z",
       "home": "Deportivo Morón",
       "away": "Colón (Santa Fe)",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "in",
+      "home_goals": 0,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261127&limit=100"
     },
@@ -105008,9 +105008,9 @@
       "date": "2026-11-28T00:00Z",
       "home": "Tristán Suárez",
       "away": "Gimnasia y Tiro (Salta)",
-      "home_goals": null,
-      "away_goals": null,
-      "status": "in",
+      "home_goals": 1,
+      "away_goals": 1,
+      "status": "post",
       "source": "ESPN public scoreboard",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.2/scoreboard?dates=20261127&limit=100"
     },
